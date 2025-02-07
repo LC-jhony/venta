@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Filament\Resources\QuoteResource\Pages;
+
+use Filament\Actions;
+use Filament\Pages\Actions\Action;
+use Filament\Resources\Pages\ViewRecord;
+use App\Filament\Resources\QuoteResource;
+
+class ViewQuote extends ViewRecord
+{
+    protected static string $resource = QuoteResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\EditAction::make(),
+            Action::make('print')
+                ->icon('fluentui-print-48-o')
+                ->url(fn($record) => route('quote-invoice.print', $record->id)),
+        ];
+    }
+}
