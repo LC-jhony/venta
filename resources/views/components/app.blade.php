@@ -5,44 +5,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>PDF Invoice</title>
     <style>
         @page {
-            margin: 220px 50px 120px 50px;
-            /* Aumenté el margen inferior para evitar superposiciones */
+            margin: 250px 50px 120px 50px;
+        }
+
+        * {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: small;
         }
 
         header {
             position: fixed;
-            top: -180px;
+            top: -220px;
             left: 0;
             right: 0;
-            height: 170px;
-            background: #ddd;
-            text-align: center;
-            line-height: 200px;
-            font-size: 20px;
+            height: 120px;
+
+            text-align: left;
+            /* padding: 20px; */
+            font-size: 18px;
+        }
+
+        div {
+            page-break-inside: avoid;
+            /* margin-bottom: 10px; */
+        }
+
+        /* Estilos para la tabla dentro del header */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-table td {
+            vertical-align: top;
+            padding: 10px;
+        }
+
+        .header-table .left {
+            width: 60%;
+        }
+
+        .header-table .right {
+            width: 40%;
+            text-align: right;
+        }
+
+        .header-table img {
+            max-width: 150px;
+        }
+
+        .header-table p,
+        .header-table h4,
+        .header-table span {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .header-table h4 {
+            font-size: 16px;
             font-weight: bold;
         }
 
-        /* footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100px;
-            background: #ddd;
-            text-align: center;
-            line-height: 100px;
-            font-size: 16px;
-        } */
-
-
-
-        /* Asegurar que los elementos no sean tapados por el footer */
-        div {
-            page-break-inside: avoid;
-            margin-bottom: 10px;
+        .header-table span {
+            font-size: 14px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -50,17 +79,32 @@
 <body>
 
     <header>
-        Encabezado
+        <table class="header-table">
+            <tr>
+                <td class="left">
+                    <span>Bill to:</span>
+                    <h4>Dwyane Clark</h4>
+                    <p>24 Dummy Street Area,</p>
+                    <p>Location, Lorem ipsum,</p>
+                    <p>570xx59x</p>
+                </td>
+                <td class="right">
+                    <img class='logo' alt='Logo'
+                        src='data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/logo-dark.png'))) }}'>
+                    <p>Company Address,</p>
+                    <p>Lorem, ipsum Dolor,</p>
+                    <p>845xx145</p>
+                </td>
+            </tr>
+        </table>
     </header>
-
-    {{-- <footer>
-        Pie de página
-    </footer> --}}
-
     <main>
-        @for ($i = 1; $i <= 100; $i++)
+        {{-- @for ($i = 1; $i <= 100; $i++)
             <div>Elemento {{ $i }}</div>
-        @endfor
+        @endfor --}}
+        <div>
+            {{ $slot }}
+        </div>
     </main>
 
 </body>
