@@ -28,11 +28,6 @@
             font-size: 18px;
         }
 
-        div {
-            page-break-inside: avoid;
-            /* margin-bottom: 10px; */
-        }
-
         /* Estilos para la tabla dentro del header */
         .header-table {
             width: 100%;
@@ -73,40 +68,13 @@
             font-size: 14px;
             font-weight: bold;
         }
+
+        /*-----*/
     </style>
 </head>
 
 <body>
-
-    <header>
-        <table class="header-table">
-            <tr>
-                <td class="left">
-                    <span>Bill to:</span>
-                    <h4>Dwyane Clark</h4>
-                    <p>24 Dummy Street Area,</p>
-                    <p>Location, Lorem ipsum,</p>
-                    <p>570xx59x</p>
-                </td>
-                <td class="right">
-                    <img class='logo' alt='Logo'
-                        src='data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/logo-dark.png'))) }}'>
-                    <p>Company Address,</p>
-                    <p>Lorem, ipsum Dolor,</p>
-                    <p>845xx145</p>
-                </td>
-            </tr>
-        </table>
-    </header>
-    <main>
-        {{-- @for ($i = 1; $i <= 100; $i++)
-            <div>Elemento {{ $i }}</div>
-        @endfor --}}
-        <div>
-            {{ $slot }}
-        </div>
-    </main>
-
+    {{ $slot }}
 </body>
 
 </html>

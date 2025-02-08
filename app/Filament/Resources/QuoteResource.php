@@ -31,6 +31,10 @@ class QuoteResource extends Resource
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
+                                Forms\Components\TextInput::make('code')
+                                    ->label('Code Bar')
+                                    ->prefixIcon('fas-barcode')
+                                    ->nullable(),
                                 Forms\Components\Select::make('user_id')
                                     ->relationship(
                                         name: 'user',
@@ -73,6 +77,7 @@ class QuoteResource extends Resource
                                             ->live()
                                             ->numeric(),
                                     ])
+                                    ->item
                                     ->addActionLabel('Add Item')
                                     ->columns(3)
                             ]),
