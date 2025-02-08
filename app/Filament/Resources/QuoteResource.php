@@ -6,6 +6,8 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\Quote;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -16,6 +18,7 @@ use App\Filament\Resources\QuoteResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\QuoteResource\RelationManagers;
+use App\Models\Product;
 
 class QuoteResource extends Resource
 {
@@ -31,10 +34,16 @@ class QuoteResource extends Resource
                     ->schema([
                         Forms\Components\Grid::make(3)
                             ->schema([
-                                Forms\Components\TextInput::make('code')
-                                    ->label('Code Bar')
-                                    ->prefixIcon('fas-barcode')
-                                    ->nullable(),
+                                Forms\Components\TextInput::make('Codigo')
+                                    ->label('Codigo')
+                                    ->autofocus(true)
+                                    ->suffixIcon('fas-barcode')
+                                    ->nullable()
+                                    ->live(onBlur: true)
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                        self::addOrUpdateProductByCode($state, $get, $set);
+                                    }),
                                 Forms\Components\Select::make('user_id')
                                     ->relationship(
                                         name: 'user',
@@ -57,27 +66,58 @@ class QuoteResource extends Resource
                     ->columnSpanFull()
                     ->schema([
                         Forms\Components\Group::make()
+
                             ->schema([
-                                TableRepeater::make('items')
+                                TableRepeater::make('DetailQuote')
+                                    ->relationship()
                                     ->headers([
                                         Header::make('description'),
                                         Header::make('quantity')->width('150px'),
-                                        Header::make('unit_price')->width('150px'),
+                                        Header::make('Price Unit')->width('150px'),
+                                        Header::make('Total Price')->width('150px'),
+
                                     ])
                                     ->schema([
-                                        Forms\Components\TextInput::make('description')
+                                        Forms\Components\Select::make('product_id')
+                                            ->label('Producto')
+                                            ->relationship('product', 'name')
+                                            ->getOptionLabelFromRecordUsing(
+                                                fn($record) => "{$record->name} - S/. {$record->purchase_price}"
+                                            )
+                                            ->searchable(['name'])
+                                            ->preload()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, Set $set) {
+                                                if ($state) {
+                                                    $product = Product::find($state);
+                                                    $set('price_unit', $product->purchase_price);
+                                                }
+                                            })
                                             ->required(),
                                         Forms\Components\TextInput::make('quantity')
-                                            ->default(1)
-                                            ->required()
-                                            ->numeric(),
-                                        Forms\Components\TextInput::make('unit_price')
-                                            ->default(10000)
+                                            ->numeric()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, $get, $set) {
+                                                $price = floatval($get('price_unit'));
+                                                $quantity = floatval($state);
+                                                $set('total_price', $price * $quantity);
+                                            }),
+                                        Forms\Components\TextInput::make('price_unit')
+                                            ->label('Price Unit')
                                             ->required()
                                             ->live()
-                                            ->numeric(),
+                                            ->afterStateUpdated(function ($state, $get, $set) {
+                                                $quantity = floatval($get('quantity'));
+                                                $price = floatval($state);
+                                                $set('total_price', $price * $quantity);
+                                            }),
+                                        Forms\Components\TextInput::make('total_price')
+                                            ->disabled()
+                                            ->numeric()
+                                            ->dehydrated(true)
+                                            ->required()
                                     ])
-                                    ->item
+                                    ->defaultItems(0)
                                     ->addActionLabel('Add Item')
                                     ->columns(3)
                             ]),
@@ -85,11 +125,43 @@ class QuoteResource extends Resource
                 Forms\Components\Textarea::make('notes')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('mail')
-                    ->required(),
+
             ]);
     }
+    public static function addOrUpdateProductByCode(string $code, Get $get, Set $set)
+    {
+        if (!$code) {
+            return;
+        }
 
+        $product = Product::where('bar_code', $code)->first();
+
+        if (!$product) {
+            return;
+        }
+
+        $detailQuote = $get('DetailQuote');
+
+        // Create new detail entry
+        $newDetail = [
+            'product_id' => $product->id,
+            'quantity' => 0,
+            'price_unit' => $product->purchase_price,
+            // 'total_price' => $product->purchase_price
+        ];
+
+
+        // Add new product to the existing details
+        if (is_array($detailQuote)) {
+            $detailQuote[] = $newDetail;
+        } else {
+            $detailQuote = [$newDetail];
+        }
+
+        // Update the form state
+        $set('DetailQuote', $detailQuote);
+        $set('Codigo', null);
+    }
     public static function table(Table $table): Table
     {
         return $table

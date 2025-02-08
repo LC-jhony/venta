@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invoice_records', function (Blueprint $table) {
+        Schema::create('detail_quotes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('quote_id');
-            $table->unsignedBigInteger('user_id');
-            $table->json('data')->nullable();
+            $table->unsignedBigInteger('product_id');
+            $table->string('quantity');
+            $table->decimal('price_unit');
+            $table->decimal('total_price');
+            $table->foreign('quote_id')->references('id')->on('quotes')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
-            $table->foreign('quote_id')->references('id')->on('quotes')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoice_records');
+        Schema::dropIfExists('detail_quotes');
     }
 };
