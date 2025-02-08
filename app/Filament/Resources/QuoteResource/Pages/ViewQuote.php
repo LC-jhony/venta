@@ -15,9 +15,9 @@ class ViewQuote extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
-            Action::make('print')
-                ->icon('fluentui-print-48-o')
-                ->url(fn($record) => route('quote-invoice.print', $record->id)),
+            //     Action::make('print')
+            //         ->icon('fluentui-print-48-o')
+            //         ->url(fn($record) => route('quote-invoice.print', $record->id)),
         ];
     }
 }

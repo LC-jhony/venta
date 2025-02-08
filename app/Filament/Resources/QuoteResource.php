@@ -19,6 +19,7 @@ use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\QuoteResource\RelationManagers;
 use App\Models\Product;
+use App\Models\Suppliers;
 
 class QuoteResource extends Resource
 {
@@ -32,18 +33,8 @@ class QuoteResource extends Resource
             ->schema([
                 Forms\Components\Section::make('User Information')
                     ->schema([
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\TextInput::make('Codigo')
-                                    ->label('Codigo')
-                                    ->autofocus(true)
-                                    ->suffixIcon('fas-barcode')
-                                    ->nullable()
-                                    ->live(onBlur: true)
-                                    ->reactive()
-                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
-                                        self::addOrUpdateProductByCode($state, $get, $set);
-                                    }),
                                 Forms\Components\Select::make('user_id')
                                     ->relationship(
                                         name: 'user',
@@ -55,127 +46,125 @@ class QuoteResource extends Resource
                                     ->dehydrated(true)
                                     ->required(),
                                 Forms\Components\TextInput::make('serial_number')
-                                    ->numeric()
-                                    ->default(null),
-                                Forms\Components\TextInput::make('serial')
-                                    ->maxLength(255)
-                                    ->default(null),
-                            ]),
+                                    ->default(function () {
+                                        $serialNumber = Quote::orderBy('serial_number', 'desc')->first();
+                                        $prefix = 'Cot_PE ' . date('y') . '-';
+                                        if ($serialNumber && str_starts_with($serialNumber->serial_number, $prefix)) {
+                                            $number = intval(substr($serialNumber->serial_number, -5)) + 1;
+                                        } else {
+                                            $number = 1;
+                                        }
+                                        return $prefix . str_pad($number, 5, '0', STR_PAD_LEFT);
+                                    })
+                                    ->disabled()
+                                    ->dehydrated(true),
+
+                            ])->columns(2),
+
                     ]),
                 Forms\Components\Group::make()
                     ->columnSpanFull()
                     ->schema([
                         Forms\Components\Group::make()
-
                             ->schema([
                                 TableRepeater::make('DetailQuote')
                                     ->relationship()
+                                    ->label('')
                                     ->headers([
                                         Header::make('description'),
-                                        Header::make('quantity')->width('150px'),
-                                        Header::make('Price Unit')->width('150px'),
-                                        Header::make('Total Price')->width('150px'),
-
+                                        Header::make('quantity')->width('120px'),
+                                        Header::make('Price Unit')->width('120px'),
+                                        Header::make('Total Price')->width('120px'),
                                     ])
                                     ->schema([
                                         Forms\Components\Select::make('product_id')
                                             ->label('Producto')
                                             ->relationship('product', 'name')
+
+                                            // Disable options that are already selected in other rows
+                                            ->disableOptionWhen(function ($value, $state, Get $get) {
+                                                return collect($get('../*.product_id'))
+                                                    ->reject(fn($id) => $id == $state)
+                                                    ->filter()
+                                                    ->contains($value);
+                                            })
                                             ->getOptionLabelFromRecordUsing(
                                                 fn($record) => "{$record->name} - S/. {$record->purchase_price}"
                                             )
                                             ->searchable(['name'])
                                             ->preload()
                                             ->live()
-                                            ->afterStateUpdated(function ($state, Set $set) {
+                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                                 if ($state) {
                                                     $product = Product::find($state);
                                                     $set('price_unit', $product->purchase_price);
+                                                    $newTotalPrice = bcmul((string) $get('quantity', 1), (string) $product->purchase_price, 2);
+                                                    $set('total_price', $newTotalPrice);
                                                 }
                                             })
                                             ->required(),
                                         Forms\Components\TextInput::make('quantity')
                                             ->numeric()
+
                                             ->live()
-                                            ->afterStateUpdated(function ($state, $get, $set) {
-                                                $price = floatval($get('price_unit'));
-                                                $quantity = floatval($state);
-                                                $set('total_price', $price * $quantity);
-                                            }),
+                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                $newTotalPrice = bcmul((string) $state, (string) $get('price_unit', 0), 2);
+                                                $set('total_price', $newTotalPrice);
+                                            })
+                                            ->required(),
                                         Forms\Components\TextInput::make('price_unit')
                                             ->label('Price Unit')
-                                            ->required()
                                             ->live()
-                                            ->afterStateUpdated(function ($state, $get, $set) {
-                                                $quantity = floatval($get('quantity'));
-                                                $price = floatval($state);
-                                                $set('total_price', $price * $quantity);
-                                            }),
+                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                                $newTotalPrice = bcmul((string) $state, (string) $get('quantity', 0), 2);
+                                                $set('total_price', $newTotalPrice);
+                                            })
+                                            ->required(),
                                         Forms\Components\TextInput::make('total_price')
                                             ->disabled()
                                             ->numeric()
                                             ->dehydrated(true)
                                             ->required()
+                                            ->reactive()
+
                                     ])
                                     ->defaultItems(0)
-                                    ->addActionLabel('Add Item')
-                                    ->columns(3)
-                            ]),
-                    ]),
+                                    ->reorderable()
+                                    ->columnSpan('full')
+                            ])->columnSpan(9),
+                        Forms\Components\Card::make()
+                            ->schema([
+                                Forms\Components\Select::make('supplier_id')
+                                    ->relationship('supplier', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required()
+                                    ->native(false),
+
+                            ])->columnSpan(3),
+                    ])
+                    ->columns(12),
                 Forms\Components\Textarea::make('notes')
                     ->required()
                     ->columnSpanFull(),
 
             ]);
     }
-    public static function addOrUpdateProductByCode(string $code, Get $get, Set $set)
-    {
-        if (!$code) {
-            return;
-        }
-
-        $product = Product::where('bar_code', $code)->first();
-
-        if (!$product) {
-            return;
-        }
-
-        $detailQuote = $get('DetailQuote');
-
-        // Create new detail entry
-        $newDetail = [
-            'product_id' => $product->id,
-            'quantity' => 0,
-            'price_unit' => $product->purchase_price,
-            // 'total_price' => $product->purchase_price
-        ];
 
 
-        // Add new product to the existing details
-        if (is_array($detailQuote)) {
-            $detailQuote[] = $newDetail;
-        } else {
-            $detailQuote = [$newDetail];
-        }
-
-        // Update the form state
-        $set('DetailQuote', $detailQuote);
-        $set('Codigo', null);
-    }
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('serial_number')
-                    ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('serial')
+                Tables\Columns\TextColumn::make('supplier.name')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('mail')
-                    ->boolean(),
+                Tables\Columns\TextColumn::make('supplier.email')
+                    ->label('Mail')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

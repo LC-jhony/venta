@@ -16,9 +16,11 @@ class Quote extends Model
         'supplier_id',
         'serial_number',
         'notes',
-        'total',
     ];
-
+    public function detailQuote(): HasMany
+    {
+        return $this->hasMany(DetailQuote::class);
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(
@@ -32,9 +34,5 @@ class Quote extends Model
             related: Suppliers::class,
             foreignKey: 'supplier_id'
         );
-    }
-    public function DetailQuote(): HasMany
-    {
-        return $this->hasMany(DetailQuote::class);
     }
 }

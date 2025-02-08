@@ -8,10 +8,16 @@ use Illuminate\Http\Request;
 
 class QuoteInvoice extends Controller
 {
-    public function QuoteInvoice()
+    public function QuoteInvoice(Quote $quote)
     {
+        // dd($quote);
+        $pdf = Pdf::loadView(
+            'pdf.invoice',
+            [
+                'quote' => $quote->load('detailQuote.product', 'user', 'supplier')
 
-        $pdf = Pdf::loadView('pdf.invoice');
+            ]
+        );
         return $pdf->stream();
     }
 }

@@ -70,6 +70,25 @@
         }
 
         /*-----*/
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .invoice-table th,
+        .invoice-table td {
+            border: 1px solid #a5b1c2;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .invoice-table th {
+            background-color: #f3f3f3;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 

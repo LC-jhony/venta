@@ -10,10 +10,9 @@
                     <p>570xx59x</p>
                 </td>
                 <td class="right">
-                    <div style="border-left: 1px solid #111;
-                    ;">
+                    <div style="border-left: 1px solid #111;">
                         <img class='logo' alt='Logo'
-                            src='data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/logo-dark.png'))) }}'>
+                            src='data:image/png;base64,{{ base64_encode(file_get_contents(asset('img/logo-dark.png'), false, stream_context_create(['ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]))) }}'>
                         <p>Company Address,</p>
                         <p>Lorem, ipsum Dolor,</p>
                         <p>845xx145</p>
@@ -49,49 +48,33 @@
         <table class="invoice-table">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Product Description</th>
                     <th>Price</th>
                     <th>Qty</th>
                     <th>Total</th>
                 </tr>
             </thead>
+            {{ $quote }}
             <tbody>
+                @foreach ($quote->detailQuote as $index => $item)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $item->product->name }}</td>
+                        <td>{{ $item->quantity }}</td>
+                        <td>{{ $item->price_unit }}</td>
+                        <td>{{ $item->total_price }}</td>
+                    </tr>
+                @endforeach
+
                 <tr>
-                    <td>Lorem ipsum Dolor</td>
-                    <td>$50.00</td>
-                    <td>5</td>
-                    <td>$250.00</td>
-                </tr>
-                <tr>
-                    <td>Pellentesque id neque ligula</td>
-                    <td>$10.00</td>
-                    <td>1</td>
-                    <td>$10.00</td>
-                </tr>
-                <tr>
-                    <td>Interdum et malesuada Fames</td>
-                    <td>$25.00</td>
-                    <td>3</td>
-                    <td>$75.00</td>
-                </tr>
-                <tr>
-                    <td>Vivamus volutpat Faucibus</td>
-                    <td>$40.00</td>
-                    <td>2</td>
-                    <td>$80.00</td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="text-align: right;"><strong>Subtotal:</strong></td>
+                    <td colspan="3"></td>
+                    <td style="text-align: right;  background-color: #f3f3f3;">
+                        <strong>Total:</strong>
+                    </td>
                     <td>$315.00</td>
                 </tr>
-                <tr>
-                    <td colspan="3" style="text-align: right;"><strong>Discount:</strong></td>
-                    <td>$00.00</td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
-                    <td>$405.00</td>
-                </tr>
+
             </tbody>
         </table>
     </div>
