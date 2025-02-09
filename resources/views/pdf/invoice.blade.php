@@ -28,17 +28,19 @@
                 <td style="width: 60%; text-align: left;">
                     <h4
                         style="font-size: 3.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">
-                        Invoice
+                        Cotización
                     </h4>
                 </td>
 
                 <!-- Columna Derecha: Invoice # y Fecha -->
                 <td style="width: 40%; text-align: right; vertical-align: top;">
-                    <p style="font-size: 1rem; font-weight: 600; margin: 0;">
-                        Invoice # <span style="padding-left: 2.5rem; font-size: 0.875rem;">24856</span>
+                    <p style="font-size: 16px; font-weight: 600; margin: 0;">
+                        Invoice #
+                        <span style="padding-left: 0.5rem; font-size:14px;">{{ $quote->serial_number }}</span>
                     </p>
-                    <p style="font-size: 1rem; font-weight: 600; margin: 0;">
-                        Date: <span style="padding-left: 2.5rem; font-size: 0.875rem;">01/02/2020</span>
+                    <p style="font-size: 16px; font-weight: 600; margin: 0;">
+                        Date: <span
+                            style="padding-left: 0.5rem; font-size:14px;">{{ $quote->created_at->format('d/m/Y') }}</span>
                     </p>
                 </td>
             </tr>
@@ -49,7 +51,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Product Description</th>
+                    <th style="text-align: left;">Product Description</th>
                     <th>Price</th>
                     <th>Qty</th>
                     <th>Total</th>
@@ -60,7 +62,7 @@
                 @foreach ($quote->detailQuote as $index => $item)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td>{{ $item->product->name }}</td>
+                        <td style="text-align: left;">{{ $item->product->name }}</td>
                         <td>{{ $item->quantity }}</td>
                         <td>{{ $item->price_unit }}</td>
                         <td>{{ $item->total_price }}</td>
@@ -68,14 +70,17 @@
                 @endforeach
 
                 <tr>
-                    <td colspan="3"></td>
+                    <td colspan="3">{{ $quote->notes }}</td>
                     <td style="text-align: right;  background-color: #f3f3f3;">
                         <strong>Total:</strong>
                     </td>
-                    <td>$315.00</td>
+                    <td>{{ number_format($quote->detailQuote->sum('total_price'), 2) }}</td>
                 </tr>
 
             </tbody>
         </table>
+
+
+
     </div>
 </x-app>

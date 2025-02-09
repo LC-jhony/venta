@@ -17,7 +17,7 @@ class Invoice extends Page
     public function mount($record)
     {
         $this->record = $record;
-        $this->quote = Quote::with('user')
+        $this->quote = Quote::with('detailQuote.product')
             ->find($record);
     }
 

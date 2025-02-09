@@ -74,13 +74,14 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            rounded-border: 10px;
         }
 
         .invoice-table th,
         .invoice-table td {
             border: 1px solid #a5b1c2;
             padding: 15px;
-            text-align: center;
+
             font-size: 14px;
         }
 
