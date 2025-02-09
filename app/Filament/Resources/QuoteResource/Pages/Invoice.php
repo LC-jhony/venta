@@ -28,13 +28,12 @@ class Invoice extends Page
             Action::make('print')
                 ->icon('solar-printer-outline')
                 ->outlined()
-                ->requiresConfirmation()
                 ->url(
                     route(
                         'PRINT.INVOICE-QUOTE',
                         ['quote' => $this->record]
                     )
-                )
+                )->requiresConfirmation()
         ];
     }
     protected static string $view = 'filament.resources.quote-resource.pages.invoice';

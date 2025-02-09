@@ -56,27 +56,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->plugin(
-                \TomatoPHP\FilamentBrowser\FilamentBrowserPlugin::make()
-                    ->hiddenFolders([
-                        base_path('app')
-                    ])
-                    ->hiddenFiles([
-                        base_path('.env')
-                    ])
-                    ->hiddenExtantions([
-                        "php"
-                    ])
-                    ->allowCreateFolder()
-                    ->allowEditFile()
-                    ->allowCreateNewFile()
-                    ->allowCreateFolder()
-                    ->allowRenameFile()
-                    ->allowDeleteFile()
-                    ->allowMarkdown()
-                    ->allowCode()
-                    ->allowPreview()
-                    ->basePath(base_path())
-            );
+        ;
     }
 }

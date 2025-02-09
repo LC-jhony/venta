@@ -9,4 +9,10 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateQuote extends CreateRecord
 {
     protected static string $resource = QuoteResource::class;
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('invoice', [
+            'record' => $this->record
+        ]);
+    }
 }
