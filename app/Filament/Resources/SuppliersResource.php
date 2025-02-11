@@ -2,20 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SuppliersResource\Pages;
-use App\Filament\Resources\SuppliersResource\RelationManagers;
-use App\Models\Suppliers;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Supplier;
+use Filament\Forms\Form;
+use App\Models\Suppliers;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\SuppliersResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\SuppliersResource\RelationManagers;
 
 class SuppliersResource extends Resource
 {
-    protected static ?string $model = Suppliers::class;
+    protected static ?string $model = Supplier::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

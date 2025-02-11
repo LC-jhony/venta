@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Quote;
+use App\Models\Purchase;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -51,6 +52,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(
             related: Quote::class,
+            foreignKey: 'user_id'
+        );
+    }
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(
+            related: Purchase::class,
             foreignKey: 'user_id'
         );
     }
