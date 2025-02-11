@@ -36,16 +36,4 @@ class Purchase extends Model
     {
         return $this->hasMany(PurchaseDetail::class);
     }
-    // protected static function booted(): void
-    // {
-    //     static::created(function (Purchase $purchase) {
-    //         foreach ($purchase->detailparchuse as $detail) {
-    //             $product = Product::find($detail->product_id);
-    //             if ($product) {
-    //                 $product->stock += $detail->quantity;
-    //                 $product->save();
-    //             }
-    //         }
-    //     });
-    // }
 }
