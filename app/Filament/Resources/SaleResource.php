@@ -52,12 +52,29 @@ class SaleResource extends Resource
                                             $product = Product::where('bar_code', $state)->first();
                                             if ($product) {
                                                 $currentDetails = $get('saleDetails') ?? [];
-                                                $currentDetails[] = [
-                                                    'product_id' => $product->id,
-                                                    'quantity' => 1,
-                                                    'unit_price' => $product->sales_price,
-                                                    'total' => $product->sales_price
-                                                ];
+
+                                                $found = false;
+                                                foreach ($currentDetails as $key => $detail) {
+                                                    if ($detail['product_id'] === $product->id) {
+                                                        $quantity = floatval($currentDetails[$key]['quantity']) + 1;
+                                                        $unitPrice = floatval($currentDetails[$key]['unit_price']);
+
+                                                        $currentDetails[$key]['quantity'] = $quantity;
+                                                        $currentDetails[$key]['total_price'] = $quantity * $unitPrice;
+                                                        $found = true;
+                                                        break;
+                                                    }
+                                                }
+
+                                                if (!$found) {
+                                                    $currentDetails[] = [
+                                                        'product_id' => $product->id,
+                                                        'quantity' => 1,
+                                                        'unit_price' => floatval($product->sales_price),
+                                                        'total_price' => floatval($product->sales_price)
+                                                    ];
+                                                }
+
                                                 $set('saleDetails', $currentDetails);
                                                 $set('code', '');
                                                 self::calculateSaleTotals($get('saleDetails'), $set);
@@ -131,7 +148,6 @@ class SaleResource extends Resource
                             ->schema([
                                 Forms\Components\Section::make('Payment Details')
                                     ->schema([
-
                                         MoneyInput::make('paid_amount')
                                             ->numeric()
                                             ->reactive()
