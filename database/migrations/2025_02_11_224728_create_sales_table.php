@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('tax', 10, 2);
             $table->decimal('total', 10, 2);
             $table->decimal('paid_amount', 10, 2);
-            $table->decimal('change_amount', 10, 2);
+            $table->decimal('change_amount', 10, 2)->nullable();
             $table->enum('payment_method', ['cash', 'card', 'transfer']);
             $table->enum('payment_status', ['pending', 'paid', 'partial']);
             $table->enum('sale_status', ['completed', 'cancelled', 'returned']);

@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\Sale\TypePyment;
+use App\Enum\Sale\TypeSale;
+use App\Enum\Sale\TypeStatus;
 use Filament\Forms;
 use App\Models\Sale;
 use Filament\Tables;
@@ -35,7 +38,7 @@ class SaleResource extends Resource
         $products = Product::get();
         return $form
             ->schema([
-                Forms\Components\Section::make('User Information')
+                Forms\Components\Section::make('Sale Information')
                     ->schema([
                         Forms\Components\Grid::make()
                             ->schema([
@@ -70,7 +73,14 @@ class SaleResource extends Resource
                                     ->maxLength(255),
                             ])->columns(3),
                         Forms\Components\Grid::make()
-                            ->schema([])->columns(3)
+                            ->schema([
+                                Forms\Components\Select::make('payment_method')
+                                    ->options(TypePyment::class),
+                                Forms\Components\Select::make('payment_status')
+                                    ->options(TypeSale::class),
+                                Forms\Components\Select::make('sale_status')
+                                    ->options(TypeStatus::class),
+                            ])->columns(3)
                     ]),
                 Forms\Components\Group::make()
                     ->columnSpanFull()
@@ -112,37 +122,42 @@ class SaleResource extends Resource
 
                                         Forms\Components\TextInput::make('total_price')
                                             ->disabled(),
-
                                     ])
                                     ->reorderable()
                                     ->columnSpan('full')
                             ])->columnSpan(8),
-                        Forms\Components\Card::make()
+
+                        Forms\Components\Grid::make()
                             ->schema([
-                                MoneyInput::make('subtotal')
-                                    ->disabled()
-                                    ->numeric(),
-                                MoneyInput::make('tax')
-                                    ->disabled()
-                                    ->numeric(),
-                                MoneyInput::make('total')
-                                    ->disabled()
-                                    ->inputMode('decimal'),
-                                Forms\Components\Select::make('payment_method')
-                                    ->options([
-                                        'cash' => 'Cash',
-                                        'card' => 'Card',
-                                        'transfer' => 'Transfer',
+                                Forms\Components\Section::make('Payment Details')
+                                    ->schema([
+
+                                        MoneyInput::make('paid_amount')
+                                            ->numeric()
+                                            ->reactive()
+                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                                $paidAmount = floatval($state); // Convertir a número
+                                                $total = floatval($get('total') ?? 0); // Obtener total o 0 si es null
+                                                $change = max($paidAmount - $total, 0); // Asegurar que no sea negativo
+                                                $set('change_amount', number_format($change, 2, '.', ',')); // Establecer el cambio
+                                            }),
+                                        MoneyInput::make('change_amount')
+                                            ->disabled()
+                                            ->numeric()
+                                            ->live(),
+                                    ]),
+                                Forms\Components\Section::make('totales')
+                                    ->schema([
+                                        MoneyInput::make('subtotal')
+                                            ->disabled(),
+                                        MoneyInput::make('tax')
+                                            ->disabled(),
+                                        MoneyInput::make('total')
+                                            ->disabled()
+                                            ->live(),
                                     ])
-                                    ->required(),
-                                Forms\Components\TextInput::make('paid_amount')
-                                    ->numeric()
-                                    ->reactive(),
-                                // ->afterStateUpdated(fn($state, callable $set)
-                                // => self::calculateChange($state, $set)),
-                                Forms\Components\TextInput::make('change_amount')
-                                    ->disabled()
-                                    ->numeric(),
+
+
                             ])->columnSpan(4),
                     ])
                     ->columns(12),
@@ -179,6 +194,7 @@ class SaleResource extends Resource
         }
         return 0;
     }
+
     public static function table(Table $table): Table
     {
         return $table
