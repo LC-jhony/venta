@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Enum\Sale\TypePyment;
-use App\Enum\Sale\TypeSale;
-use App\Enum\Sale\TypeStatus;
 use Filament\Forms;
 use App\Models\Sale;
 use Filament\Tables;
@@ -13,8 +10,12 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Enum\Sale\TypeSale;
+use App\Enum\Sale\TypePyment;
+use App\Enum\Sale\TypeStatus;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\SaleResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
@@ -81,22 +82,40 @@ class SaleResource extends Resource
                                             }
                                         }
                                     }),
-                                Forms\Components\TextInput::make('customer_id')
+                                Forms\Components\Select::make('customer_id')
+                                    ->relationship('customer', 'name')
                                     ->required()
-                                    ->numeric(),
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
+                                Forms\Components\Select::make('user_id')
+                                    ->relationship('user', 'name')
+                                    ->default(Auth::id() ?? 1)
+                                    ->required()
+                                    ->disabled()
+                                    ->dehydrated(),
                                 Forms\Components\TextInput::make('invoice_number')
                                     ->default('INV-' . date('Ymd-His'))
                                     ->required()
                                     ->maxLength(255),
-                            ])->columns(3),
+                            ])->columns(4),
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\Select::make('payment_method')
-                                    ->options(TypePyment::class),
+                                    ->options(TypePyment::class)
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
                                 Forms\Components\Select::make('payment_status')
-                                    ->options(TypeSale::class),
+                                    ->options(TypeStatus::class)
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
                                 Forms\Components\Select::make('sale_status')
-                                    ->options(TypeStatus::class),
+                                    ->options(TypeSale::class)
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
                             ])->columns(3)
                     ]),
                 Forms\Components\Group::make()
@@ -121,6 +140,8 @@ class SaleResource extends Resource
                                     ->schema([
                                         Forms\Components\Select::make('product_id')
                                             ->relationship('product', 'name')
+                                            ->searchable()
+                                            ->preload()
                                             ->reactive()
                                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
                                                 self::calculateLineTotal($get('quantity'), $state, $set);
@@ -135,11 +156,16 @@ class SaleResource extends Resource
                                             }),
 
                                         Forms\Components\TextInput::make('unit_price')
-                                            ->disabled(),
+                                            ->required()
+                                            ->disabled()
+                                            ->dehydrated(true),
 
                                         Forms\Components\TextInput::make('total_price')
-                                            ->disabled(),
+                                            ->required()
+                                            ->disabled()
+                                            ->dehydrated(true),
                                     ])
+                                    ->defaultItems(0)
                                     ->reorderable()
                                     ->columnSpan('full')
                             ])->columnSpan(8),
@@ -149,6 +175,7 @@ class SaleResource extends Resource
                                 Forms\Components\Section::make('Payment Details')
                                     ->schema([
                                         MoneyInput::make('paid_amount')
+                                            ->required()
                                             ->numeric()
                                             ->reactive()
                                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -158,19 +185,23 @@ class SaleResource extends Resource
                                                 $set('change_amount', number_format($change, 2, '.', ',')); // Establecer el cambio
                                             }),
                                         MoneyInput::make('change_amount')
+                                            ->required()
                                             ->disabled()
+                                            ->dehydrated(true)
                                             ->numeric()
                                             ->live(),
                                     ]),
                                 Forms\Components\Section::make('totales')
                                     ->schema([
                                         MoneyInput::make('subtotal')
-                                            ->disabled(),
+                                            ->disabled()
+                                            ->dehydrated(true),
                                         MoneyInput::make('tax')
-                                            ->disabled(),
+                                            ->disabled()
+                                            ->dehydrated(true),
                                         MoneyInput::make('total')
                                             ->disabled()
-                                            ->live(),
+                                            ->dehydrated(true),
                                     ])
 
 
@@ -183,6 +214,7 @@ class SaleResource extends Resource
 
             ]);
     }
+
     private static function calculateSaleTotals($saleDetails, callable $set)
     {
         $subtotal = 0;

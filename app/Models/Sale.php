@@ -26,9 +26,6 @@ class Sale extends Model
         'sale_status',
         'notes',
     ];
-
-
-
     public function customer()
     {
         return $this->belongsTo(
