@@ -2,8 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SuppliersResource\Pages;
-use App\Models\Supplier;
+use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,13 +13,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SuppliersResource extends Resource
+class UserResource extends Resource
 {
-    protected static ?string $model = Supplier::class;
+    protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'gmdi-engineering-tt';
-    protected static ?string $navigationGroup = 'Siatema POS';
-
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationGroup = 'Manager Users';
     public static function form(Form $form): Form
     {
         return $form
@@ -30,26 +30,11 @@ class SuppliersResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
+                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\TextInput::make('password')
+                    ->password()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('address')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('status')
-                    ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('country')
-                    ->maxLength(255)
-                    ->default(null),
-                Forms\Components\TextInput::make('city')
-                    ->maxLength(255)
-                    ->default(null),
-                Forms\Components\TextInput::make('state')
-                    ->maxLength(255)
-                    ->default(null),
             ]);
     }
 
@@ -61,18 +46,9 @@ class SuppliersResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('address')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('status')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('country')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('city')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('state')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('email_verified_at')
+                    ->dateTime()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -112,10 +88,10 @@ class SuppliersResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSuppliers::route('/'),
-            'create' => Pages\CreateSuppliers::route('/create'),
-            'view' => Pages\ViewSuppliers::route('/{record}'),
-            'edit' => Pages\EditSuppliers::route('/{record}/edit'),
+            'index' => Pages\ListUsers::route('/'),
+            'create' => Pages\CreateUser::route('/create'),
+            'view' => Pages\ViewUser::route('/{record}'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 
