@@ -18,6 +18,7 @@ enum TypeMeasure: string implements HasLabel
     case GALON = 'Galon';
     case BOLSA = 'Bolsa';
     case CAJA = 'Caja';
+
     public function getLabel(): ?string
     {
         return match ($this) {

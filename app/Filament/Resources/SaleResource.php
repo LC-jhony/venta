@@ -2,25 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use App\Models\Sale;
-use Filament\Tables;
+use App\Enum\Sale\TypePyment;
+use App\Enum\Sale\TypeSale;
+use App\Enum\Sale\TypeStatus;
+use App\Filament\Resources\SaleResource\Pages;
 use App\Models\Product;
+use App\Models\Sale;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Enum\Sale\TypeSale;
-use App\Enum\Sale\TypePyment;
-use App\Enum\Sale\TypeStatus;
 use Filament\Resources\Resource;
-use Awcodes\TableRepeater\Header;
-use Illuminate\Support\Facades\Auth;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\SaleResource\Pages;
-use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\SaleResource\RelationManagers;
+use Illuminate\Support\Facades\Auth;
 use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
 
 class SaleResource extends Resource
@@ -30,13 +29,15 @@ class SaleResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Compras / Ventas';
-    protected static ?string $recordTitleAttribute = 'sale_number'; //para que se pueda buscar de manera global
 
-    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; //cambiar el icono de la seccion activa
+    protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
+
+    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
 
     public static function form(Form $form): Form
     {
         $products = Product::get();
+
         return $form
             ->schema([
                 Forms\Components\Section::make('Sale Information')
@@ -67,12 +68,12 @@ class SaleResource extends Resource
                                                     }
                                                 }
 
-                                                if (!$found) {
+                                                if (! $found) {
                                                     $currentDetails[] = [
                                                         'product_id' => $product->id,
                                                         'quantity' => 1,
                                                         'unit_price' => floatval($product->sales_price),
-                                                        'total_price' => floatval($product->sales_price)
+                                                        'total_price' => floatval($product->sales_price),
                                                     ];
                                                 }
 
@@ -95,7 +96,7 @@ class SaleResource extends Resource
                                     ->disabled()
                                     ->dehydrated(),
                                 Forms\Components\TextInput::make('invoice_number')
-                                    ->default('INV-' . date('Ymd-His'))
+                                    ->default('INV-'.date('Ymd-His'))
                                     ->required()
                                     ->maxLength(255),
                             ])->columns(4),
@@ -116,7 +117,7 @@ class SaleResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->native(false),
-                            ])->columns(3)
+                            ])->columns(3),
                     ]),
                 Forms\Components\Group::make()
                     ->columnSpanFull()
@@ -167,7 +168,7 @@ class SaleResource extends Resource
                                     ])
                                     ->defaultItems(0)
                                     ->reorderable()
-                                    ->columnSpan('full')
+                                    ->columnSpan('full'),
                             ])->columnSpan(8),
 
                         Forms\Components\Grid::make()
@@ -202,15 +203,14 @@ class SaleResource extends Resource
                                         MoneyInput::make('total')
                                             ->disabled()
                                             ->dehydrated(true),
-                                    ])
-
+                                    ]),
 
                             ])->columnSpan(4),
                     ])
                     ->columns(12),
 
                 Forms\Components\Textarea::make('notes')
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
 
             ]);
     }
@@ -231,6 +231,7 @@ class SaleResource extends Resource
         $set('tax', round($tax, 2));
         $set('total', round($total, 2));
     }
+
     private static function calculateLineTotal($quantity, $productId, callable $set)
     {
         $product = Product::find($productId);
@@ -238,8 +239,10 @@ class SaleResource extends Resource
             $totalPrice = $quantity * $product->sales_price;
             $set('unit_price', $product->sales_price);
             $set('total_price', round($totalPrice, 2));
+
             return $totalPrice;
         }
+
         return 0;
     }
 
@@ -292,6 +295,9 @@ class SaleResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

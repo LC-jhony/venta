@@ -9,6 +9,7 @@ enum TypePyment: string implements HasLabel
     case Cash = 'cash';
     case Card = 'card';
     case Transfer = 'transfer';
+
     public function getLabel(): ?string
     {
         return match ($this) {

@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-use App\Models\Quote;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DetailQuote extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
         'quote_id',
         'product_id',
@@ -18,6 +17,7 @@ class DetailQuote extends Model
         'price_unit',
         'total_price',
     ];
+
     public function quote(): BelongsTo
     {
         return $this->belongsTo(
@@ -25,6 +25,7 @@ class DetailQuote extends Model
             foreignKey: 'quote_id',
         );
     }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(

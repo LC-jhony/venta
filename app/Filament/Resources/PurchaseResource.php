@@ -2,37 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Product;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use App\Models\Purchase;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Awcodes\TableRepeater\Header;
-use Filament\Actions\ImportAction;
-use Illuminate\Support\Facades\Auth;
-use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Actions\Action;
 use App\Filament\Resources\PurchaseResource\Pages;
+use App\Models\Product;
+use App\Models\Purchase;
 use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PurchaseResource\RelationManagers;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseResource extends Resource
 {
     protected static ?string $model = Purchase::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+
     protected static ?string $navigationGroup = 'Compras / Ventas';
 
-    protected static ?string $recordTitleAttribute = 'purchase_number'; //para que se pueda buscar de manera global
+    protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
 
-    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; //cambiar el icono de la seccion activa
-
+    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
 
     public static function form(Form $form): Form
     {
@@ -98,7 +92,7 @@ class PurchaseResource extends Resource
                                     ])
                                     ->defaultItems(0)
                                     ->reorderable()
-                                    ->columnSpan('full')
+                                    ->columnSpan('full'),
                             ])->columnSpan(9),
                         Forms\Components\Card::make()
                             ->schema([
@@ -106,7 +100,7 @@ class PurchaseResource extends Resource
                                     ->label(__('Purchase Number'))
                                     ->required()
                                     ->dehydrated()
-                                    ->default('ORDCMP-' . now()->format('Ymd') . '-' . rand(1000, 99999999))
+                                    ->default('ORDCMP-'.now()->format('Ymd').'-'.rand(1000, 99999999))
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
                                     ->options([

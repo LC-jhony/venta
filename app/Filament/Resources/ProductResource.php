@@ -2,18 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Product;
-use Filament\Forms\Form;
 use App\Enum\TypeMeasure;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Product;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\ProductResource\RelationManagers;
 
 class ProductResource extends Resource
 {
@@ -43,7 +42,7 @@ class ProductResource extends Resource
                                 Forms\Components\Grid::make()
                                     ->schema([
                                         Forms\Components\TextInput::make('bar_code')
-                                            //->label('Codigo barra')
+                                            // ->label('Codigo barra')
                                             ->required(),
                                         Forms\Components\TextInput::make('name')
                                             //  ->label('Nombre')
@@ -63,7 +62,7 @@ class ProductResource extends Resource
                                             ->required()
                                             ->live()
                                             ->disabled()
-                                            ->dehydrated(true)
+                                            ->dehydrated(true),
                                     ])->columns(2),
                             ])->columnSpan(3),
                     ])->columns(4),
@@ -73,7 +72,7 @@ class ProductResource extends Resource
                             // ->label('Stock')
                             ->required(),
                         Forms\Components\TextInput::make('stock_minimum')
-                            //->label('Stock minimo')
+                            // ->label('Stock minimo')
                             ->required(),
                         Forms\Components\Select::make('unit_measure')
                             // ->label('Unidad de medida')
@@ -100,8 +99,7 @@ class ProductResource extends Resource
                             //  ->label('Fecha de vencimiento')
                             ->required()
                             ->native(false),
-                    ])->columns(2)
-
+                    ])->columns(2),
 
             ]);
     }
@@ -114,12 +112,12 @@ class ProductResource extends Resource
             ->defaultPaginationPageOption(5)
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
-                    //->label('Imagen')
+                    // ->label('Imagen')
                     ->disk('public')
                     ->circular()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('bar_code')
-                    //->label('Codigo de barra')
+                    // ->label('Codigo de barra')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     // ->label('Nombre')
@@ -131,19 +129,17 @@ class ProductResource extends Resource
                     // ->label('Precio de venta')
                     ->money('usd', true),
                 Tables\Columns\TextColumn::make('stock')
-                    //->label('Stock')
+                    // ->label('Stock')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('stock_minimum')
                     // ->label('Stock minimo')
                     ->searchable()
                     ->badge()
                     ->color(
-                        fn($record): string =>
-                        $record->stock <= $record->stock_minimum ? 'danger' : ($record->stock <= $record->stock_minimum * 2 ? 'warning' : 'success')
+                        fn ($record): string => $record->stock <= $record->stock_minimum ? 'danger' : ($record->stock <= $record->stock_minimum * 2 ? 'warning' : 'success')
                     )
                     ->icon(
-                        fn($record) =>
-                        $record->stock <= $record->stock_minimum ? 'heroicon-o-exclamation-triangle' : ($record->stock <= $record->stock_minimum * 2 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
+                        fn ($record) => $record->stock <= $record->stock_minimum ? 'heroicon-o-exclamation-triangle' : ($record->stock <= $record->stock_minimum * 2 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
                     ),
                 Tables\Columns\TextColumn::make('category.name')
                     // ->label('Categoria')
@@ -160,16 +156,14 @@ class ProductResource extends Resource
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('expiration')
-                    //->label('Fecha de vencimiento')
+                    // ->label('Fecha de vencimiento')
                     ->badge()
                     ->date()
                     ->color(
-                        fn($record): string =>
-                        now()->diffInDays($record->expiration, false) <= 0 ? 'danger' : (now()->diffInDays($record->expiration, false) <= 30 ? 'warning' : 'success')
+                        fn ($record): string => now()->diffInDays($record->expiration, false) <= 0 ? 'danger' : (now()->diffInDays($record->expiration, false) <= 30 ? 'warning' : 'success')
                     )
                     ->icon(
-                        fn($record) =>
-                        now()->diffInDays($record->expiration, false) <= 0 ? 'heroicon-o-x-circle' : (now()->diffInDays($record->expiration, false) <= 30 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
+                        fn ($record) => now()->diffInDays($record->expiration, false) <= 0 ? 'heroicon-o-x-circle' : (now()->diffInDays($record->expiration, false) <= 30 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
                     ),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -214,6 +208,7 @@ class ProductResource extends Resource
                                 default => $query
                             };
                         }
+
                         return $query;
                     })
                     ->native(false),
@@ -233,9 +228,10 @@ class ProductResource extends Resource
                                 default => $query
                             };
                         }
+
                         return $query;
                     })
-                    ->native(false)
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

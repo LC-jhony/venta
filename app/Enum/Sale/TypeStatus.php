@@ -9,6 +9,7 @@ enum TypeStatus: string implements HasLabel
     case Pending = 'pending';
     case Paid = 'paid';
     case Partial = 'partial';
+
     public function getLabel(): ?string
     {
         return match ($this) {

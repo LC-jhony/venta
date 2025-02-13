@@ -2,25 +2,25 @@
 
 namespace App\Filament\Resources\QuoteResource\Pages;
 
-use Filament\Pages\Actions\Action;
-use Filament\Resources\Pages\Page;
-use Illuminate\Contracts\View\View;
 use App\Filament\Resources\QuoteResource;
 use App\Models\Quote;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Pages\Actions\Action;
+use Filament\Resources\Pages\Page;
 
 class Invoice extends Page
 {
     protected static string $resource = QuoteResource::class;
+
     public $record;
+
     public $quote;
+
     public function mount($record)
     {
         $this->record = $record;
         $this->quote = Quote::with('detailQuote.product')
             ->find($record);
     }
-
 
     protected function getHeaderActions(): array
     {
@@ -33,8 +33,9 @@ class Invoice extends Page
                         'PRINT.INVOICE-QUOTE',
                         ['quote' => $this->record]
                     )
-                )->requiresConfirmation()
+                )->requiresConfirmation(),
         ];
     }
+
     protected static string $view = 'filament.resources.quote-resource.pages.invoice';
 }

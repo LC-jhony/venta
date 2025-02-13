@@ -3,12 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Quote;
-use App\Models\Purchase;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -48,6 +46,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function quotes(): HasMany
     {
         return $this->hasMany(
@@ -55,6 +54,7 @@ class User extends Authenticatable
             foreignKey: 'user_id'
         );
     }
+
     public function purchases(): HasMany
     {
         return $this->hasMany(

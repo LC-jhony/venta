@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\Sale;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SaleDetail extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
         'sale_id',
         'product_id',
@@ -19,7 +18,6 @@ class SaleDetail extends Model
         'discount',
 
     ];
-
 
     public function updateProductStock()
     {

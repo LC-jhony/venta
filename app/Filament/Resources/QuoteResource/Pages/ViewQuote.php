@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\QuoteResource\Pages;
 
+use App\Filament\Resources\QuoteResource;
 use Filament\Actions;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\QuoteResource;
 
 class ViewQuote extends ViewRecord
 {

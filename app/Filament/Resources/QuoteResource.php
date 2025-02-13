@@ -2,24 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
+use App\Filament\Resources\QuoteResource\Pages;
+use App\Models\Product;
 use App\Models\Quote;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Tables\Table;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Awcodes\TableRepeater\Header;
-use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\QuoteResource\Pages;
-use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\QuoteResource\RelationManagers;
-use App\Models\Product;
-use App\Models\Suppliers;
 
 class QuoteResource extends Resource
 {
@@ -39,7 +35,7 @@ class QuoteResource extends Resource
                                     ->relationship(
                                         name: 'user',
                                         titleAttribute: 'name',
-                                        modifyQueryUsing: fn(Builder $query) => $query->latest()
+                                        modifyQueryUsing: fn (Builder $query) => $query->latest()
                                     )
                                     ->default(auth()->id())
                                     ->disabled()
@@ -48,13 +44,14 @@ class QuoteResource extends Resource
                                 Forms\Components\TextInput::make('serial_number')
                                     ->default(function () {
                                         $serialNumber = Quote::orderBy('serial_number', 'desc')->first();
-                                        $prefix = 'Cot_PE ' . date('y') . '-';
+                                        $prefix = 'Cot_PE '.date('y').'-';
                                         if ($serialNumber && str_starts_with($serialNumber->serial_number, $prefix)) {
                                             $number = intval(substr($serialNumber->serial_number, -5)) + 1;
                                         } else {
                                             $number = 1;
                                         }
-                                        return $prefix . str_pad($number, 5, '0', STR_PAD_LEFT);
+
+                                        return $prefix.str_pad($number, 5, '0', STR_PAD_LEFT);
                                     })
                                     ->disabled()
                                     ->dehydrated(true),
@@ -84,12 +81,12 @@ class QuoteResource extends Resource
                                             // Disable options that are already selected in other rows
                                             ->disableOptionWhen(function ($value, $state, Get $get) {
                                                 return collect($get('../*.product_id'))
-                                                    ->reject(fn($id) => $id == $state)
+                                                    ->reject(fn ($id) => $id == $state)
                                                     ->filter()
                                                     ->contains($value);
                                             })
                                             ->getOptionLabelFromRecordUsing(
-                                                fn($record) => "{$record->name} - S/. {$record->purchase_price}"
+                                                fn ($record) => "{$record->name} - S/. {$record->purchase_price}"
                                             )
                                             ->searchable(['name'])
                                             ->preload()
@@ -125,12 +122,12 @@ class QuoteResource extends Resource
                                             ->numeric()
                                             ->dehydrated(true)
                                             ->required()
-                                            ->reactive()
+                                            ->reactive(),
 
                                     ])
                                     ->defaultItems(0)
                                     ->reorderable()
-                                    ->columnSpan('full')
+                                    ->columnSpan('full'),
                             ])->columnSpan(9),
                         Forms\Components\Card::make()
                             ->schema([
@@ -150,7 +147,6 @@ class QuoteResource extends Resource
 
             ]);
     }
-
 
     public static function table(Table $table): Table
     {
@@ -192,7 +188,7 @@ class QuoteResource extends Resource
                     ->label(__('View Invoice'))
                     ->icon('lineawesome-file-pdf')
                     ->color('success')
-                    ->url(fn($record) => self::getUrl('invoice', ['record' => $record->id])),
+                    ->url(fn ($record) => self::getUrl('invoice', ['record' => $record->id])),
 
             ])
             ->bulkActions([
@@ -216,7 +212,7 @@ class QuoteResource extends Resource
         return [
             'index' => Pages\ListQuotes::route('/'),
             'create' => Pages\CreateQuote::route('/create'),
-            //'view' => Pages\ViewQuote::route('/{record}'),
+            // 'view' => Pages\ViewQuote::route('/{record}'),
             'edit' => Pages\EditQuote::route('/{record}/edit'),
             'invoice' => Pages\Invoice::route('/{record}/invoice'),
         ];
