@@ -13,8 +13,6 @@ class CashRegister extends Model
         'user_id',
         'initial_amount',
         'final_amount',
-        'sale_total',
-        'purchase_total',
         'notes',
         'open_date',
         'close_date',

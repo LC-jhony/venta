@@ -15,9 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->decimal('initial_amount', 10, 2);
-            $table->decimal('final_amount', 10, 2);
-            $table->decimal('sale_total', 10, 2);
-            $table->decimal('purchase_total', 10, 2);
+            $table->decimal('final_amount', 10, 2)->nullable();
             $table->text('notes')->nullable();
             $table->date('open_date');
             $table->date('close_date')->nullable();

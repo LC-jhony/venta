@@ -24,22 +24,21 @@ class CashRegisterResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->required(),
-
-                Forms\Components\TextInput::make('initial_amount')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('final_amount')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('sale_total')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('purchase_total')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->default(Auth::id() ?? 1)
+                            ->required()
+                            ->disabled()
+                            ->dehydrated(),
+                        Forms\Components\TextInput::make('initial_amount')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('final_amount')
+                            ->numeric(),
+                    ])
+                    ->columns(3),
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull(),
                 Forms\Components\DatePicker::make('open_date')
