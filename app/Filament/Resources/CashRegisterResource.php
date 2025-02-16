@@ -3,10 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CashRegisterResource\Pages;
-use App\Filament\Resources\CashRegisterResource\RelationManagers;
 use App\Models\CashRegister;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -19,7 +19,9 @@ class CashRegisterResource extends Resource
     protected static ?string $model = CashRegister::class;
 
     protected static ?string $navigationIcon = 'fas-cash-register';
+
     protected static ?string $navigationGroup = 'Compras / Ventas';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -34,18 +36,34 @@ class CashRegisterResource extends Resource
                             ->dehydrated(),
                         Forms\Components\TextInput::make('initial_amount')
                             ->required()
-                            ->numeric(),
+                            ->numeric()
+                            ->minValue(0)
+                            ->step(0.01),
                         Forms\Components\TextInput::make('final_amount')
-                            ->numeric(),
+                            ->numeric()
+                            ->numeric()
+                            ->minValue(0)
+                            ->step(0.01)
+                            ->disabled()
+                            ->dehydrated(),
                     ])
                     ->columns(3),
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull(),
-                Forms\Components\DatePicker::make('open_date')
-                    ->required(),
-                Forms\Components\DatePicker::make('close_date'),
-                Forms\Components\Toggle::make('status')
-                    ->required(),
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\DatePicker::make('open_date')
+                            ->required()
+                            ->default(now())
+                            ->disabled()
+                            ->dehydrated(true),
+                        Forms\Components\DatePicker::make('close_date')
+                            ->after('open_date'),
+                        Forms\Components\Toggle::make('status')
+                            ->required()
+                            ->default(true)
+                            ->disabled(fn($record) => $record && ! $record->status),
+                    ])->columns(3),
             ]);
     }
 
@@ -58,16 +76,29 @@ class CashRegisterResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('initial_amount')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->money()
+                    ->badge()->color('success'),
                 Tables\Columns\TextColumn::make('final_amount')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->money(),
                 Tables\Columns\TextColumn::make('sale_total')
                     ->numeric()
+                    ->badge()
+                    ->state(function (CashRegister $record): float {
+                        return $record->totals()->sum('sale_total');
+                    })
+                    ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('purchase_total')
                     ->numeric()
-                    ->sortable(),
+                    ->badge()->color('danger')
+                    ->sortable()
+                    ->state(function (CashRegister $record): float {
+                        return $record->totals()->sum('purchase_total');
+                    })
+                    ->money(),
                 Tables\Columns\TextColumn::make('open_date')
                     ->date()
                     ->sortable(),
@@ -75,7 +106,8 @@ class CashRegisterResource extends Resource
                     ->date()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('status')
-                    ->boolean(),
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -91,6 +123,32 @@ class CashRegisterResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('close')
+                    ->requiresConfirmation()
+                    ->color('danger')
+                    ->icon('fas-lock')
+                    ->visible(fn($record) => $record->status)
+                    ->action(function (CashRegister $record) {
+                        // Refrescamos el registro con las relaciones necesarias
+                        $record->load('totals');
+
+                        // Calculamos el balance actual
+                        $currentBalance = $record->initial_amount +
+                            $record->totals()->sum('sale_total') -
+                            $record->totals()->sum('purchase_total');
+
+                        $record->update([
+                            'status' => false,
+                            'close_date' => now(),
+                            'final_amount' => $currentBalance,
+                        ]);
+                        Notification::make()
+                            ->title('Cierre de caja')
+                            ->body('La caja ha sido cerrada con éxito')
+                            ->success();
+                    }),
+
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -103,9 +161,7 @@ class CashRegisterResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

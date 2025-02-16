@@ -22,6 +22,7 @@ class QuoteResource extends Resource
     protected static ?string $model = Quote::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
+
     protected static ?string $navigationGroup = 'Siatema POS';
 
     public static function form(Form $form): Form
@@ -36,7 +37,7 @@ class QuoteResource extends Resource
                                     ->relationship(
                                         name: 'user',
                                         titleAttribute: 'name',
-                                        modifyQueryUsing: fn(Builder $query) => $query->latest()
+                                        modifyQueryUsing: fn (Builder $query) => $query->latest()
                                     )
                                     ->default(auth()->id())
                                     ->disabled()
@@ -45,14 +46,14 @@ class QuoteResource extends Resource
                                 Forms\Components\TextInput::make('serial_number')
                                     ->default(function () {
                                         $serialNumber = Quote::orderBy('serial_number', 'desc')->first();
-                                        $prefix = 'Cot_PE ' . date('y') . '-';
+                                        $prefix = 'Cot_PE '.date('y').'-';
                                         if ($serialNumber && str_starts_with($serialNumber->serial_number, $prefix)) {
                                             $number = intval(substr($serialNumber->serial_number, -5)) + 1;
                                         } else {
                                             $number = 1;
                                         }
 
-                                        return $prefix . str_pad($number, 5, '0', STR_PAD_LEFT);
+                                        return $prefix.str_pad($number, 5, '0', STR_PAD_LEFT);
                                     })
                                     ->disabled()
                                     ->dehydrated(true),
@@ -82,12 +83,12 @@ class QuoteResource extends Resource
                                             // Disable options that are already selected in other rows
                                             ->disableOptionWhen(function ($value, $state, Get $get) {
                                                 return collect($get('../*.product_id'))
-                                                    ->reject(fn($id) => $id == $state)
+                                                    ->reject(fn ($id) => $id == $state)
                                                     ->filter()
                                                     ->contains($value);
                                             })
                                             ->getOptionLabelFromRecordUsing(
-                                                fn($record) => "{$record->name} - S/. {$record->purchase_price}"
+                                                fn ($record) => "{$record->name} - S/. {$record->purchase_price}"
                                             )
                                             ->searchable(['name'])
                                             ->preload()
@@ -189,7 +190,7 @@ class QuoteResource extends Resource
                     ->label(__('View Invoice'))
                     ->icon('lineawesome-file-pdf')
                     ->color('success')
-                    ->url(fn($record) => self::getUrl('invoice', ['record' => $record->id])),
+                    ->url(fn ($record) => self::getUrl('invoice', ['record' => $record->id])),
 
             ])
             ->bulkActions([

@@ -4,7 +4,7 @@ namespace App\Filament\Resources\SaleResource\Pages;
 
 use Filament\Actions;
 use Filament\Infolists\Infolist;
-use Awcodes\TableRepeater\Header;
+use Filament\Pages\Actions\Action;
 use Filament\Infolists\Components\Card;
 use Filament\Infolists\Components\Grid;
 use App\Filament\Resources\SaleResource;
@@ -12,10 +12,7 @@ use Filament\Infolists\Components\Group;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Pages\Actions\Action;
-use Filament\Infolists\Components\RepeatableEntry;
-use Awcodes\TableRepeater\Components\TableRepeater;
-use PrintFilament\Print\Infolists\Components\PrintComponent;
+use Pelmered\FilamentMoneyField\Infolists\Components\MoneyEntry;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 
 class ViewSale extends ViewRecord
@@ -35,9 +32,10 @@ class ViewSale extends ViewRecord
                         'PRINT.INVOICE-SALE',
                         ['sale' => $this->record]
                     )
-                )
+                ),
         ];
     }
+
     public function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -64,9 +62,9 @@ class ViewSale extends ViewRecord
                                         TextEntry::make('payment_status')
                                             ->label(__('Status')),
                                         TextEntry::make('sale_status')
-                                            ->label(__('Sale Status'))
+                                            ->label(__('Sale Status')),
                                     ])
-                                    ->columns(3)
+                                    ->columns(3),
                             ]),
                         Group::make()
                             ->columnSpanFull()
@@ -80,13 +78,17 @@ class ViewSale extends ViewRecord
                                                     ->label(__('Description')),
                                                 TextEntry::make('quantity')
                                                     ->label(__('Quantity')),
-                                                TextEntry::make('unit_price')
-                                                    ->label(__('Price Unit')),
-                                                TextEntry::make('total_price')
-                                                    ->label(__('Total Price')),
+                                                    MoneyEntry::make('unit_price')
+                                                    ->label(__('Price Unit'))
+                                                        ->decimals(2)
+                                                   ,
+                                                    MoneyEntry::make('total_price')
+                                                    ->label(__('Total Price'))
+                                                        ->decimals(2)
+                                                  ,
                                             ])
                                             ->striped()
-                                            ->columnSpan('full')
+                                            ->columnSpan('full'),
                                     ])->columnSpan(10),
 
                                 Grid::make()
@@ -97,9 +99,14 @@ class ViewSale extends ViewRecord
                                                     ->label(__('Sub Total')),
                                                 TextEntry::make('tax')
                                                     ->label(__('IGV')),
-                                                TextEntry::make('total')
-                                                    ->label(__('Total')),
-                                            ])
+                                                    MoneyEntry::make('total')
+                                                    ->label(__('Total'))
+                                                    ->currency('PEN')
+                                                    ->locale('es_ES')
+                                                    ->decimals(2)
+                                              
+                                                    ,
+                                            ]),
                                     ])->columnSpan(2),
                             ])
                             ->columns(12),
@@ -107,11 +114,10 @@ class ViewSale extends ViewRecord
                             ->schema([
                                 TextEntry::make('notes')
                                     ->label(__('Notes'))
-                                    ->columnSpanFull()
-                            ])
+                                    ->columnSpanFull(),
+                            ]),
 
-
-                    ])
+                    ]),
             ]);
     }
 }
