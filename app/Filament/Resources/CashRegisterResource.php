@@ -6,11 +6,13 @@ use Filament\Forms;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\CashMovement;
 use App\Models\CashRegister;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use App\Enum\CashMovement\MovementType;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CashRegisterResource\Pages;
@@ -45,26 +47,27 @@ class CashRegisterResource extends Resource
                             ->numeric()
                             ->minValue(0)
                             ->step(0.01),
-                        Forms\Components\TextInput::make('final_amount')
-                            ->numeric()
-                            ->numeric()
-                            ->minValue(0)
-                            ->step(0.01)
+                        Forms\Components\DatePicker::make('open_date')
+                            ->required()
+                            ->default(now())
                             ->disabled()
-                            ->dehydrated(),
+                            ->dehydrated(true),
+                        // Forms\Components\TextInput::make('final_amount')
+                        //     ->numeric()
+                        //     ->numeric()
+                        //     ->minValue(0)
+                        //     ->step(0.01)
+                        //     ->disabled()
+                        //     ->dehydrated(),
                     ])
                     ->columns(3),
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull(),
                 Forms\Components\Grid::make()
                     ->schema([
-                        Forms\Components\DatePicker::make('open_date')
-                            ->required()
-                            ->default(now())
-                            ->disabled()
-                            ->dehydrated(true),
-                        Forms\Components\DatePicker::make('close_date')
-                            ->after('open_date'),
+
+                        // Forms\Components\DatePicker::make('close_date')
+                        //     ->after('open_date'),
                         Forms\Components\Toggle::make('status')
                             ->required()
                             ->default(true)
@@ -99,16 +102,31 @@ class CashRegisterResource extends Resource
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('Movement')
                     ->icon('heroicon-o-inbox-arrow-down')
+                    ->fillForm(fn(CashRegister $record): array => [
+                        'user_id' => $record->user_id,
+                        'cash_register_id' => $record->id,
+                    ])
                     ->form([
-                        Forms\Components\Select::make('amount')
-                            ->options(MovementType::class)
-                            ->required()
-                            ->native(false),
-                        Forms\Components\TextInput::make('sale_total'),
-                        Forms\Components\TextInput::make('purchase_total')
-                    ]),
-
-
+                        Forms\Components\Hidden::make('cash_register_id')
+                            ->required(),
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\Select::make('type')
+                                    ->options(MovementType::class)
+                                    ->required()
+                                    ->native(false),
+                                Forms\Components\TextInput::make('amount')
+                                    ->required(),
+                            ])->columns(2),
+                        Forms\Components\Textarea::make('description')
+                    ])
+                    ->action(function (array $data, CashRegister $record): void {
+                        CashMovement::create($data);
+                    })->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Cash Movement'),
+                    )
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
