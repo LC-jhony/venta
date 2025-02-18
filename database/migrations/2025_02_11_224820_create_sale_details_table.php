@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->string('unit_price');
             $table->string('total_price');
-            $table->string('discount',)->default(0);
+            $table->string('discount')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

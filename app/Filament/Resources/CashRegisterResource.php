@@ -2,29 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
+use App\Enum\CashMovement\MovementType;
+use App\Filament\Resources\CashRegisterResource\Pages;
+use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsEntradaRelationManager;
+use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsRelationManager;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
-use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Auth;
-use App\Enum\CashMovement\MovementType;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\CashRegisterResource\Pages;
-use App\Filament\Resources\CashRegisterResource\RelationManagers;
-use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsRelationManager;
-use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsSalidaRelationManager;
-use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsEntradaRelationManager;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class CashRegisterResource extends Resource
 {
     protected static ?string $model = CashRegister::class;
-
 
     protected static ?string $navigationIcon = 'fas-cash-register';
 
@@ -71,7 +65,7 @@ class CashRegisterResource extends Resource
                         Forms\Components\Toggle::make('status')
                             ->required()
                             ->default(true)
-                            ->disabled(fn($record) => $record && ! $record->status),
+                            ->disabled(fn ($record) => $record && ! $record->status),
                     ])->columns(3),
             ]);
     }
@@ -98,11 +92,11 @@ class CashRegisterResource extends Resource
                     ->requiresConfirmation()
                     ->color('danger')
                     ->icon('fas-lock')
-                    ->visible(fn($record) => $record->status),
+                    ->visible(fn ($record) => $record->status),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('Movement')
                     ->icon('heroicon-o-inbox-arrow-down')
-                    ->fillForm(fn(CashRegister $record): array => [
+                    ->fillForm(fn (CashRegister $record): array => [
                         'user_id' => $record->user_id,
                         'cash_register_id' => $record->id,
                     ])
@@ -118,15 +112,16 @@ class CashRegisterResource extends Resource
                                 Forms\Components\TextInput::make('amount')
                                     ->required(),
                             ])->columns(2),
-                        Forms\Components\Textarea::make('description')
+                        Forms\Components\Textarea::make('description'),
                     ])
                     ->action(function (array $data, CashRegister $record): void {
                         CashMovement::create($data);
-                    })->successNotification(
+                    })
+                    ->successNotification(
                         Notification::make()
                             ->success()
                             ->title('Cash Movement'),
-                    )
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -2,18 +2,18 @@
 
 namespace App\Filament\Resources\SaleResource\Pages;
 
+use App\Filament\Resources\SaleResource;
 use Filament\Actions;
-use Filament\Infolists\Infolist;
-use Filament\Pages\Actions\Action;
 use Filament\Infolists\Components\Card;
 use Filament\Infolists\Components\Grid;
-use App\Filament\Resources\SaleResource;
 use Filament\Infolists\Components\Group;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Pelmered\FilamentMoneyField\Infolists\Components\MoneyEntry;
+use Filament\Infolists\Infolist;
+use Filament\Pages\Actions\Action;
+use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
+use Pelmered\FilamentMoneyField\Infolists\Components\MoneyEntry;
 
 class ViewSale extends ViewRecord
 {

@@ -10,19 +10,22 @@ use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CashMovementsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cashMovements';
+
     protected static ?string $title = 'Output';
+
     protected static ?string $icon = 'heroicon-o-archive-box';
 
     protected function getTableQuery(): Builder
     {
         $query = parent::getTableQuery() ?? $this->getRelationship()->getQuery();
+
         return $query->where('type', 'Salida');
     }
+
     public function form(Form $form): Form
     {
         return $form
@@ -33,7 +36,7 @@ class CashMovementsRelationManager extends RelationManager
                     ->native(false),
                 Forms\Components\TextInput::make('amount')
                     ->required(),
-                Forms\Components\Textarea::make('description')
+                Forms\Components\Textarea::make('description'),
             ]);
     }
 
@@ -49,9 +52,7 @@ class CashMovementsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('amount')
                     ->label('Output')
                     ->money()
-                    ->summarize(Sum::make())
-
-
+                    ->summarize(Sum::make()),
 
             ])
             ->filters([

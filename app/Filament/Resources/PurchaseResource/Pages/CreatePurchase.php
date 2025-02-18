@@ -2,35 +2,37 @@
 
 namespace App\Filament\Resources\PurchaseResource\Pages;
 
+use App\Filament\Resources\PurchaseResource;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
-use App\Models\CashRegisterTotal;
-use Illuminate\Support\Facades\Auth;
-use Filament\Notifications\Notification;
 use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\PurchaseResource;
+use Illuminate\Support\Facades\Auth;
 
 class CreatePurchase extends CreateRecord
 {
     protected static string $resource = PurchaseResource::class;
+
     public function beforeCreate(): void
     {
         $this->validateCashRegisterStatus();
     }
+
     protected function afterCreate(): void
     {
         $this->createCashRegisterTotal();
     }
+
     private function validateCashRegisterStatus(): void
     {
         $cashRegister = $this->getCurrentUserCashRegister();
 
-        if (!$cashRegister) {
+        if (! $cashRegister) {
             $this->notifyCashRegisterRequired();
         }
 
-        if (!$cashRegister?->status) {
+        if (! $cashRegister?->status) {
             $this->notifyCashRegisterClosed();
         }
     }
@@ -42,11 +44,12 @@ class CreatePurchase extends CreateRecord
             ->latest()
             ->first();
     }
+
     private function createCashRegisterTotal(): void
     {
         $cashRegister = $this->getCurrentUserCashRegister();
 
-        if (!$cashRegister) {
+        if (! $cashRegister) {
             return;
         }
         CashMovement::create([
@@ -55,6 +58,7 @@ class CreatePurchase extends CreateRecord
             'amount' => $this->record->total,
         ]);
     }
+
     private function notifyCashRegisterRequired(): void
     {
 
@@ -64,7 +68,7 @@ class CreatePurchase extends CreateRecord
             ->actions([
                 Action::make('Open Cash Register')
                     ->button()
-                    ->url(route('filament.admin.resources.cash-registers.create'), shouldOpenInNewTab: true,)
+                    ->url(route('filament.admin.resources.cash-registers.create'), shouldOpenInNewTab: true),
 
             ])
             ->danger()
@@ -72,6 +76,7 @@ class CreatePurchase extends CreateRecord
 
         $this->halt();
     }
+
     private function notifyCashRegisterClosed(): void
     {
         Notification::make()

@@ -8,6 +8,7 @@ enum MovementType: string implements HasLabel
 {
     case Entrada = 'Entrada';
     case Salida = 'Salida';
+
     public function getLabel(): ?string
     {
         return match ($this) {

@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Enum\Sale\TypePyment;
-use App\Enum\Sale\TypeSale;
-use App\Enum\Sale\TypeStatus;
 use App\Filament\Resources\SaleResource\Pages;
 use App\Models\Product;
 use App\Models\Sale;
@@ -96,7 +93,7 @@ class SaleResource extends Resource
                                     ->disabled()
                                     ->dehydrated(),
                                 Forms\Components\TextInput::make('invoice_number')
-                                    ->default('INV-' . date('Ymd-His'))
+                                    ->default('INV-'.date('Ymd-His'))
                                     ->required()
                                     ->maxLength(255),
                             ])->columns(4),
@@ -195,8 +192,6 @@ class SaleResource extends Resource
                             ])->columnSpan(4),
                     ])
                     ->columns(12),
-
-
 
             ]);
     }

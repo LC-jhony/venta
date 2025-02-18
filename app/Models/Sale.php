@@ -23,11 +23,13 @@ class Sale extends Model
         // 'sale_status',
         'notes',
     ];
+
     protected $casts = [
         'subtotal' => 'float',
         'tax' => 'float',
         'total' => 'float',
     ];
+
     public function customer()
     {
         return $this->belongsTo(

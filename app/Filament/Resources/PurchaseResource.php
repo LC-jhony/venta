@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
+use App\Filament\Resources\PurchaseResource\Pages;
 use App\Models\Product;
+use App\Models\Purchase;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use App\Models\Purchase;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Awcodes\TableRepeater\Header;
-use Illuminate\Support\Facades\Auth;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\PurchaseResource\Pages;
-use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseResource extends Resource
 {
@@ -102,7 +102,7 @@ class PurchaseResource extends Resource
                                             ->live()
                                             ->dehydrated()
                                             ->readOnly()
-                                            ->required()
+                                            ->required(),
 
                                     ])
                                     ->defaultItems(0)
@@ -115,7 +115,7 @@ class PurchaseResource extends Resource
                                     ->label(__('Purchase Number'))
                                     ->required()
                                     ->dehydrated()
-                                    ->default('ORDCMP-' . now()->format('Ymd') . '-' . rand(1000, 99999999))
+                                    ->default('ORDCMP-'.now()->format('Ymd').'-'.rand(1000, 99999999))
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
                                     ->options([
@@ -130,6 +130,7 @@ class PurchaseResource extends Resource
                     ->columns(12),
             ]);
     }
+
     private static function calculatePurchaseTotal($detailparchuse, callable $set)
     {
         $total = 0;
@@ -138,6 +139,7 @@ class PurchaseResource extends Resource
         }
         $set('total', $total);
     }
+
     public static function table(Table $table): Table
     {
         return $table
