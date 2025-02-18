@@ -65,7 +65,7 @@ class CashRegisterResource extends Resource
                         Forms\Components\Toggle::make('status')
                             ->required()
                             ->default(true)
-                            ->disabled(fn ($record) => $record && ! $record->status),
+                            ->disabled(fn($record) => $record && ! $record->status),
                     ])->columns(3),
             ]);
     }
@@ -77,26 +77,71 @@ class CashRegisterResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('open_date')
+                    ->date()
+                    ->badge()
+                    ->color('info'),
                 Tables\Columns\TextColumn::make('initial_amount')
                     ->numeric()
                     ->sortable()
                     ->money()
-                    ->badge()->color('success'),
+                    ->badge()
+                    ->color('success'),
+
+                // Tables\Columns\TextColumn::make('cashMovements.amount')
+                //     ->badge()
+                //     ->formatStateUsing(function ($state, $record) {
+                //         $output = $record->cashMovements()
+                //             ->where('type', 'Salida')
+                //             ->pluck('amount');
+                //         return $output;
+                //     }),
+                Tables\Columns\TextColumn::make('final_amount')
+                    ->money()
+                    ->badge()->color('danger'),
+                Tables\Columns\TextColumn::make('close_date')
+                    ->date()
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
+                Tables\Columns\IconColumn::make('status')
+                    ->boolean()
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                //Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('close')
                     ->requiresConfirmation()
                     ->color('danger')
                     ->icon('fas-lock')
-                    ->visible(fn ($record) => $record->status),
+                    ->visible(fn($record) => $record->status)
+                    ->action(
+                        function (CashRegister $record) {
+                            $totalOutput = $record->cashMovements()
+                                ->where('type', 'Salida')
+                                ->sum('amount');
+                            $totalInput = $record->cashMovements()
+                                ->where('type', 'Entrada')
+                                ->sum('amount');
+                            $mountfinal = $record->initial_amount + $totalOutput - $totalInput;
+                            dump($record->initial_amount, $totalOutput, $totalInput, $mountfinal);
+                            $record->update([
+                                'final_amount' => $mountfinal,
+                                'status' => false,
+                                'close_date' => now(),
+                            ]);
+                            Notification::make()
+                                ->title('Cierre de caja')
+                                ->body('La caja ha sido cerrada con éxito')
+                                ->success();
+                        }
+                    ),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('Movement')
                     ->icon('heroicon-o-inbox-arrow-down')
-                    ->fillForm(fn (CashRegister $record): array => [
+                    ->fillForm(fn(CashRegister $record): array => [
                         'user_id' => $record->user_id,
                         'cash_register_id' => $record->id,
                     ])
