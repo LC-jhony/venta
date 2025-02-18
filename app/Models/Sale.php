@@ -16,14 +16,18 @@ class Sale extends Model
         'subtotal',
         'tax',
         'total',
-        'paid_amount',
-        'change_amount',
-        'payment_method',
-        'payment_status',
-        'sale_status',
+        // 'paid_amount',
+        // 'change_amount',
+        // 'payment_method',
+        // 'payment_status',
+        // 'sale_status',
         'notes',
     ];
-
+    protected $casts = [
+        'subtotal' => 'float',
+        'tax' => 'float',
+        'total' => 'float',
+    ];
     public function customer()
     {
         return $this->belongsTo(

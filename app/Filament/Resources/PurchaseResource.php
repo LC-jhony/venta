@@ -2,19 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PurchaseResource\Pages;
-use App\Models\Product;
-use App\Models\Purchase;
-use Awcodes\TableRepeater\Components\TableRepeater;
-use Awcodes\TableRepeater\Header;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Product;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use App\Models\Purchase;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\Resource;
+use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PurchaseResource\Pages;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PurchaseResource extends Resource
 {
@@ -46,8 +48,12 @@ class PurchaseResource extends Resource
                             ->searchable()
                             ->preload()
                             ->native(false),
+                        Forms\Components\TextInput::make('total')
+                            ->disabled()
+                            ->required()
+                            ->dehydrated(true),
 
-                    ])->columns(2),
+                    ])->columns(3),
                 Forms\Components\Group::make()
                     ->columnSpanFull()
                     ->schema([
@@ -56,7 +62,13 @@ class PurchaseResource extends Resource
                                 TableRepeater::make('detailparchuse')
                                     ->relationship()
                                     ->label('')
-
+                                    ->live()
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        $details = $get('detailparchuse');
+                                        if ($details) {
+                                            self::calculatePurchaseTotal($details, $set);
+                                        }
+                                    })
                                     ->headers([
                                         Header::make('description'),
                                         Header::make('quantity')->width('120px'),
@@ -79,16 +91,19 @@ class PurchaseResource extends Resource
                                             ->required(),
                                         Forms\Components\TextInput::make('quantity')
                                             ->label(__('Quantity'))
+                                            ->numeric()
                                             ->default(1)
                                             ->live()
                                             ->dehydrated()
                                             ->required(),
+
                                         Forms\Components\TextInput::make('unit_cost')
                                             ->label(__('Parchuse Price'))
                                             ->live()
                                             ->dehydrated()
                                             ->readOnly()
-                                            ->required(),
+                                            ->required()
+
                                     ])
                                     ->defaultItems(0)
                                     ->reorderable()
@@ -100,7 +115,7 @@ class PurchaseResource extends Resource
                                     ->label(__('Purchase Number'))
                                     ->required()
                                     ->dehydrated()
-                                    ->default('ORDCMP-'.now()->format('Ymd').'-'.rand(1000, 99999999))
+                                    ->default('ORDCMP-' . now()->format('Ymd') . '-' . rand(1000, 99999999))
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
                                     ->options([
@@ -115,7 +130,14 @@ class PurchaseResource extends Resource
                     ->columns(12),
             ]);
     }
-
+    private static function calculatePurchaseTotal($detailparchuse, callable $set)
+    {
+        $total = 0;
+        foreach ($detailparchuse as $detail) {
+            $total += $detail['unit_cost'];
+        }
+        $set('total', $total);
+    }
     public static function table(Table $table): Table
     {
         return $table

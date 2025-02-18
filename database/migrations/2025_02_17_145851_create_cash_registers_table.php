@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('cash_registers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->decimal('initial_amount', 10, 2);
-            $table->decimal('final_amount', 10, 2)->nullable();
-            $table->text('notes')->nullable();
             $table->date('open_date');
             $table->date('close_date')->nullable();
+            $table->string('initial_amount');
+            $table->string('final_amount')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

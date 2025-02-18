@@ -45,7 +45,15 @@ class ProductResource extends Resource
                                     ->schema([
                                         Forms\Components\TextInput::make('bar_code')
                                             // ->label('Codigo barra')
-                                            ->required(),
+                                            ->required()
+                                            ->default(function () {
+                                                do {
+                                                    $barcode = str_pad(mt_rand(1, 999999999), 9, '0', STR_PAD_LEFT);
+                                                } while (Product::where('bar_code', $barcode)->exists());
+                                                return $barcode;
+                                            })
+                                            ->disabled()
+                                            ->dehydrated(true),
                                         Forms\Components\TextInput::make('name')
                                             //  ->label('Nombre')
                                             ->required(),
@@ -138,10 +146,10 @@ class ProductResource extends Resource
                     ->searchable()
                     ->badge()
                     ->color(
-                        fn ($record): string => $record->stock <= $record->stock_minimum ? 'danger' : ($record->stock <= $record->stock_minimum * 2 ? 'warning' : 'success')
+                        fn($record): string => $record->stock <= $record->stock_minimum ? 'danger' : ($record->stock <= $record->stock_minimum * 2 ? 'warning' : 'success')
                     )
                     ->icon(
-                        fn ($record) => $record->stock <= $record->stock_minimum ? 'heroicon-o-exclamation-triangle' : ($record->stock <= $record->stock_minimum * 2 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
+                        fn($record) => $record->stock <= $record->stock_minimum ? 'heroicon-o-exclamation-triangle' : ($record->stock <= $record->stock_minimum * 2 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
                     ),
                 Tables\Columns\TextColumn::make('category.name')
                     // ->label('Categoria')
@@ -162,10 +170,10 @@ class ProductResource extends Resource
                     ->badge()
                     ->date()
                     ->color(
-                        fn ($record): string => now()->diffInDays($record->expiration, false) <= 0 ? 'danger' : (now()->diffInDays($record->expiration, false) <= 30 ? 'warning' : 'success')
+                        fn($record): string => now()->diffInDays($record->expiration, false) <= 0 ? 'danger' : (now()->diffInDays($record->expiration, false) <= 30 ? 'warning' : 'success')
                     )
                     ->icon(
-                        fn ($record) => now()->diffInDays($record->expiration, false) <= 0 ? 'heroicon-o-x-circle' : (now()->diffInDays($record->expiration, false) <= 30 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
+                        fn($record) => now()->diffInDays($record->expiration, false) <= 0 ? 'heroicon-o-x-circle' : (now()->diffInDays($record->expiration, false) <= 30 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
                     ),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

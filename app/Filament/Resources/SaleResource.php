@@ -96,27 +96,14 @@ class SaleResource extends Resource
                                     ->disabled()
                                     ->dehydrated(),
                                 Forms\Components\TextInput::make('invoice_number')
-                                    ->default('INV-'.date('Ymd-His'))
+                                    ->default('INV-' . date('Ymd-His'))
                                     ->required()
                                     ->maxLength(255),
                             ])->columns(4),
                         Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\Select::make('payment_method')
-                                    ->options(TypePyment::class)
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false),
-                                Forms\Components\Select::make('payment_status')
-                                    ->options(TypeStatus::class)
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false),
-                                Forms\Components\Select::make('sale_status')
-                                    ->options(TypeSale::class)
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false),
+                                Forms\Components\Textarea::make('notes')
+                                    ->columnSpanFull(),
                             ])->columns(3),
                     ]),
                 Forms\Components\Group::make()
@@ -173,34 +160,34 @@ class SaleResource extends Resource
 
                         Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\Section::make('Payment Details')
-                                    ->schema([
-                                        MoneyInput::make('paid_amount')
-                                            ->required()
-                                            ->numeric()
-                                            ->reactive()
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                                $paidAmount = floatval($state); // Convertir a número
-                                                $total = floatval($get('total') ?? 0); // Obtener total o 0 si es null
-                                                $change = max($paidAmount - $total, 0); // Asegurar que no sea negativo
-                                                $set('change_amount', number_format($change, 2, '.', ',')); // Establecer el cambio
-                                            }),
-                                        MoneyInput::make('change_amount')
-                                            ->required()
-                                            ->disabled()
-                                            ->dehydrated(true)
-                                            ->numeric()
-                                            ->live(),
-                                    ]),
+                                // Forms\Components\Section::make('Payment Details')
+                                //     ->schema([
+                                //         MoneyInput::make('paid_amount')
+                                //             ->required()
+                                //             ->numeric()
+                                //             ->reactive()
+                                //             ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                //                 $paidAmount = floatval($state); // Convertir a número
+                                //                 $total = floatval($get('total') ?? 0); // Obtener total o 0 si es null
+                                //                 $change = max($paidAmount - $total, 0); // Asegurar que no sea negativo
+                                //                 $set('change_amount', number_format($change, 2, '.', ',')); // Establecer el cambio
+                                //             }),
+                                //         MoneyInput::make('change_amount')
+                                //             ->required()
+                                //             ->disabled()
+                                //             ->dehydrated(true)
+                                //             ->numeric()
+                                //             ->live(),
+                                //     ]),
                                 Forms\Components\Section::make('totales')
                                     ->schema([
-                                        MoneyInput::make('subtotal')
+                                        Forms\Components\TextInput::make('subtotal')
                                             ->disabled()
                                             ->dehydrated(true),
-                                        MoneyInput::make('tax')
+                                        Forms\Components\TextInput::make('tax')
                                             ->disabled()
                                             ->dehydrated(true),
-                                        MoneyInput::make('total')
+                                        Forms\Components\TextInput::make('total')
                                             ->disabled()
                                             ->dehydrated(true),
                                     ]),
@@ -209,8 +196,7 @@ class SaleResource extends Resource
                     ])
                     ->columns(12),
 
-                Forms\Components\Textarea::make('notes')
-                    ->columnSpanFull(),
+
 
             ]);
     }
@@ -250,10 +236,10 @@ class SaleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('customer_id')
+                Tables\Columns\TextColumn::make('customer.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('invoice_number')
@@ -265,17 +251,8 @@ class SaleResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('paid_amount')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('change_amount')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('payment_method'),
-                Tables\Columns\TextColumn::make('payment_status'),
-                Tables\Columns\TextColumn::make('sale_status'),
+                    ->numeric(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

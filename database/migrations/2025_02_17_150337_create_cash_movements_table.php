@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cash_register_totals', function (Blueprint $table) {
+        Schema::create('cash_movements', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('cash_register_id');
-            $table->decimal('sale_total', 10, 2);
-            $table->decimal('purchase_total', 10, 2);
+            $table->enum('type', ['Entrada', 'Salida']);
+            $table->string('amount');
+            $table->text('description')->nullable();
             $table->foreign('cash_register_id')->references('id')->on('cash_registers')->onDelete('cascade');
             $table->timestamps();
         });
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cash_register_totals');
+        Schema::dropIfExists('cash_movements');
     }
 };

@@ -34,7 +34,7 @@ class SuppliersResource extends Resource
                 Forms\Components\TextInput::make('phone')
                     ->tel()
                     ->required()
-                    ->maxLength(255),
+                    ->regex('/^\+?[0-9]{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/'),
                 Forms\Components\TextInput::make('address')
                     ->required()
                     ->maxLength(255),

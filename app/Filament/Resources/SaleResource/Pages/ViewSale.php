@@ -78,14 +78,10 @@ class ViewSale extends ViewRecord
                                                     ->label(__('Description')),
                                                 TextEntry::make('quantity')
                                                     ->label(__('Quantity')),
-                                                    MoneyEntry::make('unit_price')
-                                                    ->label(__('Price Unit'))
-                                                        ->decimals(2)
-                                                   ,
-                                                    MoneyEntry::make('total_price')
-                                                    ->label(__('Total Price'))
-                                                        ->decimals(2)
-                                                  ,
+                                                TextEntry::make('unit_price')
+                                                    ->label(__('Price Unit')),
+                                                TextEntry::make('total_price')
+                                                    ->label(__('Total Price')),
                                             ])
                                             ->striped()
                                             ->columnSpan('full'),
@@ -99,13 +95,11 @@ class ViewSale extends ViewRecord
                                                     ->label(__('Sub Total')),
                                                 TextEntry::make('tax')
                                                     ->label(__('IGV')),
-                                                    MoneyEntry::make('total')
+                                                MoneyEntry::make('total')
                                                     ->label(__('Total'))
                                                     ->currency('PEN')
                                                     ->locale('es_ES')
-                                                    ->decimals(2)
-                                              
-                                                    ,
+                                                    ->decimals(2),
                                             ]),
                                     ])->columnSpan(2),
                             ])

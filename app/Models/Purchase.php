@@ -16,6 +16,7 @@ class Purchase extends Model
         'supplier_id',
         'purchase_number',
         'status',
+        'total'
     ];
 
     public function user(): BelongsTo

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('supplier_id');
             $table->string('purchase_number');
             $table->boolean('status');
+            $table->decimal('total', 10, 2);
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('user_id')->references('id')->on('users');

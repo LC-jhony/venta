@@ -64,7 +64,7 @@
                         <td>{{ $index + 1 }}</td>
                         <td style="text-align: left;">{{ $item->product->name }}</td>
                         <td>{{ $item->quantity }}</td>
-                        <td>{{ $item->price_unit }}</td>
+                        <td>{{ $item->unit_price }}</td>
                         <td>{{ $item->total_price }}</td>
                     </tr>
                 @endforeach
@@ -75,21 +75,21 @@
                     <td style="text-align: right; background-color: #f3f3f3; padding: 8px; font-weight: 600;">
                         Sub Total:
                     </td>
-                    <td style="padding: 8px; border-top: 1px solid #ddd;">{{ number_format($sale->subtotal) }}</td>
+                    <td style="padding: 8px; border-top: 1px solid #ddd;">{{ $sale->subtotal, 2, ',', '.' }}</td>
                 </tr>
                 <tr>
 
                     <td style="text-align: right; background-color: #f3f3f3; padding: 8px; font-weight: 600;">
                         IGV (18%):
                     </td>
-                    <td style="padding: 8px;">{{ number_format($sale->tax) }}</td>
+                    <td style="padding: 8px;">{{ number_format($sale->tax, 2, ',', '.') }}</td>
                 </tr>
                 <tr>
 
                     <td style="text-align: right; background-color: #f3f3f3; padding: 8px; font-weight: 600;">
                         Total:
                     </td>
-                    <td style="padding: 8px; font-weight: bold;">{{ number_format($sale->total) }}</td>
+                    <td style="padding: 8px; font-weight: bold;">{{ moneyFormat($sale->total, 2, ',', '.') }}</td>
                 </tr>
             </tbody>
         </table>
