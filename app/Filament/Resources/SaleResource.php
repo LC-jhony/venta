@@ -31,7 +31,10 @@ class SaleResource extends Resource
     protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
 
     protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
-
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
     public static function form(Form $form): Form
     {
         $products = Product::get();

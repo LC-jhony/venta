@@ -36,8 +36,8 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Parchuse / Sale',
                 'Sistem POS',
-                'Filament Shield'
-
+                'Filament Shield',
+                'Systemm'
             ])
             ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

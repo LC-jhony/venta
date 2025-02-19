@@ -19,7 +19,10 @@ class SuppliersResource extends Resource
     protected static ?string $navigationIcon = 'gmdi-engineering-tt';
 
     protected static ?string $navigationGroup = 'Sistem POS';
-
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
     public static function form(Form $form): Form
     {
         return $form
