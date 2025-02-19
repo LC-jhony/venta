@@ -22,7 +22,7 @@ class CashRegisterResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-cash-register';
 
-    protected static ?string $navigationGroup = 'Compras / Ventas';
+    protected static ?string $navigationGroup = 'Parchuse / Sale';
 
     public static function form(Form $form): Form
     {

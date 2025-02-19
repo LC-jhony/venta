@@ -24,7 +24,7 @@ class PurchaseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
-    protected static ?string $navigationGroup = 'Compras / Ventas';
+    protected static ?string $navigationGroup = 'Parchuse / Sale';
 
     protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
 
@@ -115,7 +115,7 @@ class PurchaseResource extends Resource
                                     ->label(__('Purchase Number'))
                                     ->required()
                                     ->dehydrated()
-                                    ->default('ORDCMP-'.now()->format('Ymd').'-'.rand(1000, 99999999))
+                                    ->default('ORDCMP-' . now()->format('Ymd') . '-' . rand(1000, 99999999))
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
                                     ->options([

@@ -26,7 +26,7 @@ class SaleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Compras / Ventas';
+    protected static ?string $navigationGroup = 'Parchuse / Sale';
 
     protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
 

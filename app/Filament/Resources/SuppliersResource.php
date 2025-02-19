@@ -18,7 +18,7 @@ class SuppliersResource extends Resource
 
     protected static ?string $navigationIcon = 'gmdi-engineering-tt';
 
-    protected static ?string $navigationGroup = 'Siatema POS';
+    protected static ?string $navigationGroup = 'Sistem POS';
 
     public static function form(Form $form): Form
     {
