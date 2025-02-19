@@ -13,6 +13,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -93,7 +94,7 @@ class SaleResource extends Resource
                                     ->disabled()
                                     ->dehydrated(),
                                 Forms\Components\TextInput::make('invoice_number')
-                                    ->default('INV-'.date('Ymd-His'))
+                                    ->default('INV-' . date('Ymd-His'))
                                     ->required()
                                     ->maxLength(255),
                             ])->columns(4),
@@ -246,8 +247,8 @@ class SaleResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->numeric(),
-
+                    ->numeric()
+                    ->summarize(Sum::make()),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
