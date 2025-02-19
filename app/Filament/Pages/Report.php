@@ -19,7 +19,7 @@ class Report extends Page
     protected static ?string $title = 'Reports';
     protected static ?int $navigationSort = 1;
 
-    public $startDate, $endDate, $reportType;
+    public $startDate, $endDate, $reportType, $productFilter;
     public $showReport = false;
 
     public function mount(): void
@@ -56,6 +56,20 @@ class Report extends Page
                             $this->showReport = true;
                         })
                         ->native(false),
+                    Forms\Components\Select::make('productFilter')
+                        ->label('Product Filter')
+                        ->options([
+                            'all' => 'All Products',
+                            'expired' => 'Expired Products',
+                            'low_stock' => 'Low Stock Products',
+                            'out_of_stock' => 'Out of Stock Products',
+                            'near_expiry' => 'Products Near Expiry'
+                        ])
+                        ->visible(fn($get) => $get('reportType') === 'products')
+                        ->default('all')
+                        ->required()
+                        ->live()
+                        ->native(false),
                 ])
                 ->columns(3)
         ];
@@ -91,10 +105,11 @@ class Report extends Page
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'reportType' => $this->reportType,
+            'productFilter' => $this->productFilter ?? 'all',
         ]);
         return response()->streamDownload(
             fn() => print($pdf->output()),
-            'report-{$this->reportType}-' . now()->format('Y-m-d') . '.pdf'
+            "report-{$this->reportType}-" . ($this->productFilter ? "{$this->productFilter}-" : "") . now()->format('Y-m-d') . '.pdf'
         );
     }
     private function getSalesReport()
@@ -122,9 +137,29 @@ class Report extends Page
 
     private function getProductsReport()
     {
-        return Product::select('name', 'stock', 'sales_price', 'purchase_price')
+        $query = Product::query();
+
+        switch ($this->productFilter) {
+            case 'expired':
+                $query->where('expiration', '<', now());
+                break;
+            case 'low_stock':
+                $query->whereRaw('stock <= stock_minimum AND stock > 0');
+                break;
+            case 'out_of_stock':
+                $query->where('stock', '<=', 0);
+                break;
+            case 'near_expiry':
+                $query->whereBetween('expiration', [now(), now()->addDays(30)]);
+                break;
+        }
+
+        return $query->select('name', 'stock', 'sales_price', 'purchase_price', 'expiration', 'stock_minimum')
             ->orderBy('stock', 'desc')
             ->get();
+        // return Product::select('name', 'stock', 'sales_price', 'purchase_price')
+        //     ->orderBy('stock', 'desc')
+        //     ->get();
     }
 
     private function getInventoryReport()

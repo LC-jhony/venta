@@ -66,45 +66,75 @@
             </tbody>
         </table>
     @elseif($reportType === 'products')
-        <table>
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Stock</th>
-                    <th>Precio Venta</th>
-                    <th>Precio Compra</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($data as $product)
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
                     <tr>
-                        <td>{{ $product->name }}</td>
-                        <td>{{ $product->stock }}</td>
-                        <td>${{ number_format($product->sales_price, 2) }}</td>
-                        <td>${{ number_format($product->purchase_price, 2) }}</td>
+                        <th>Producto</th>
+                        <th>Stock</th>
+                        <th>Stock Mínimo</th>
+                        <th>Precio Venta</th>
+                        <th>Precio Compra</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Estado</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @elseif($reportType === 'inventory')
-        <table>
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Stock Actual</th>
-                    <th>Stock Mínimo</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($data as $product)
+                </thead>
+                <tbody>
+                    @foreach ($data as $product)
+                        @php
+                            $rowClass = '';
+                            $status = '';
+
+                            if ($product->stock <= 0) {
+                                $rowClass = 'danger-row';
+                                $status = 'Sin Stock';
+                            } elseif ($product->stock <= $product->stock_minimum) {
+                                $rowClass = 'warning-row';
+                                $status = 'Stock Bajo';
+                            }
+
+                            if ($product->expiration) {
+                                if (strtotime($product->expiration) < time()) {
+                                    $rowClass = 'danger-row';
+                                    $status = 'Expirado';
+                                } elseif (strtotime($product->expiration) < strtotime('+30 days')) {
+                                    $rowClass = 'warning-row';
+                                    $status = 'Próximo a Vencer';
+                                }
+                            }
+                        @endphp
+                        <tr class="{{ $rowClass }}">
+                            <td>{{ $product->name }}</td>
+                            <td>{{ $product->stock }}</td>
+                            <td>{{ $product->stock_minimum }}</td>
+                            <td>${{ number_format($product->sales_price, 2) }}</td>
+                            <td>${{ number_format($product->purchase_price, 2) }}</td>
+                            <td>{{ $product->expiration ? date('Y-m-d', strtotime($product->expiration)) : 'N/A' }}
+                            </td>
+                            <td>{{ $status }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @elseif($reportType === 'inventory')
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ $product->name }}</td>
-                        <td>{{ $product->stock }}</td>
-                        <td>{{ $product->stock_minimum }}</td>
+                        <th>Producto</th>
+                        <th>Stock Actual</th>
+                        <th>Stock Mínimo</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($data as $product)
+                        <tr>
+                            <td>{{ $product->name }}</td>
+                            <td>{{ $product->stock }}</td>
+                            <td>{{ $product->stock_minimum }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
     @endif
 </body>
 
