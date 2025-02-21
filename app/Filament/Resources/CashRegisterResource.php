@@ -2,27 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use App\Enum\CashMovement\MovementType;
-use App\Filament\Resources\CashRegisterResource\Pages;
-use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsEntradaRelationManager;
-use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsRelationManager;
+use Filament\Forms;
+use Filament\Tables;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use App\Enum\CashMovement\MovementType;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\ActionGroup;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CashRegisterResource\Pages;
+use App\Filament\Resources\CashRegisterResource\RelationManagers;
 
 class CashRegisterResource extends Resource
 {
     protected static ?string $model = CashRegister::class;
 
-    protected static ?string $navigationIcon = 'fas-cash-register';
-
-    protected static ?string $navigationGroup = 'Parchuse / Sale';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -36,32 +36,22 @@ class CashRegisterResource extends Resource
                             ->required()
                             ->disabled()
                             ->dehydrated(),
-                        Forms\Components\TextInput::make('initial_amount')
-                            ->required()
-                            ->numeric()
-                            ->minValue(0)
-                            ->step(0.01),
                         Forms\Components\DatePicker::make('open_date')
                             ->required()
                             ->default(now())
                             ->disabled()
                             ->dehydrated(true),
-                        // Forms\Components\TextInput::make('final_amount')
-                        //     ->numeric()
-                        //     ->numeric()
-                        //     ->minValue(0)
-                        //     ->step(0.01)
-                        //     ->disabled()
-                        //     ->dehydrated(),
+                        Forms\Components\TextInput::make('initial_amount')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->step(0.01),
                     ])
                     ->columns(3),
                 Forms\Components\Textarea::make('notes')
                     ->columnSpanFull(),
                 Forms\Components\Grid::make()
                     ->schema([
-
-                        // Forms\Components\DatePicker::make('close_date')
-                        //     ->after('open_date'),
                         Forms\Components\Toggle::make('status')
                             ->required()
                             ->default(true)
@@ -79,46 +69,51 @@ class CashRegisterResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('open_date')
                     ->date()
+                    ->sortable()
                     ->badge()
                     ->color('info'),
-                Tables\Columns\TextColumn::make('initial_amount')
-                    ->numeric()
-                    ->sortable()
-                    ->money()
-                    ->badge()
-                    ->color('success'),
-
-                // Tables\Columns\TextColumn::make('cashMovements.amount')
-                //     ->badge()
-                //     ->formatStateUsing(function ($state, $record) {
-                //         $output = $record->cashMovements()
-                //             ->where('type', 'Salida')
-                //             ->pluck('amount');
-                //         return $output;
-                //     }),
-                Tables\Columns\TextColumn::make('final_amount')
-                    ->money()
-                    ->badge()->color('danger'),
                 Tables\Columns\TextColumn::make('close_date')
                     ->date()
                     ->sortable()
                     ->badge()
                     ->color('primary'),
+                Tables\Columns\TextColumn::make('initial_amount')
+                    ->searchable()
+                    ->numeric()
+                    ->sortable()
+                    ->money()
+                    ->badge()
+                    ->color('success'),
+                Tables\Columns\TextColumn::make('final_amount')
+                    ->searchable()
+                    ->money()
+                    ->badge()->color('danger'),
                 Tables\Columns\IconColumn::make('status')
-                    ->boolean()
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('deleted_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                //Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('close')
-                    ->requiresConfirmation()
-                    ->color('danger')
-                    ->icon('fas-lock')
-                    ->visible(fn($record) => $record->status)
-                    ->action(
-                        function (CashRegister $record) {
+                ActionGroup::make([
+                    Tables\actions\Action::make('close')
+                        ->requiresConfirmation()
+                        ->color('danger')
+                        ->icon('fas-lock')
+                        ->visible(fn($record) => $record->status)
+                        ->action(function (CashRegister $record) {
                             $totalOutput = $record->cashMovements()
                                 ->where('type', 'Salida')
                                 ->sum('amount');
@@ -126,51 +121,61 @@ class CashRegisterResource extends Resource
                                 ->where('type', 'Entrada')
                                 ->sum('amount');
                             $mountfinal = $record->initial_amount + $totalOutput - $totalInput;
-                            dump($record->initial_amount, $totalOutput, $totalInput, $mountfinal);
                             $record->update([
                                 'final_amount' => $mountfinal,
                                 'status' => false,
                                 'close_date' => now(),
                             ]);
+                        }),
+                    Tables\Actions\Action::make('Movement')
+                        ->color('success')
+                        ->icon('heroicon-o-inbox-arrow-down')
+                        ->visible(fn($record) => $record->status)
+                        ->fillForm(fn(CashRegister $record): array => [
+                            'user_id' => $record->user_id,
+                            'cash_register_id' => $record->id,
+                        ])
+                        ->form([
+                            Forms\Components\Hidden::make('cash_register_id')
+                                ->required(),
+                            Forms\Components\Grid::make()
+                                ->schema([
+                                    Forms\Components\Select::make('type')
+                                        ->options(MovementType::class)
+                                        ->required()
+                                        ->native(false),
+                                    Forms\Components\TextInput::make('amount')
+                                        ->required(),
+                                ])->columns(2),
+                            Forms\Components\Textarea::make('description'),
+                        ])
+                        ->action(function (array $data, CashRegister $record): void {
+                            CashMovement::create($data);
+
                             Notification::make()
-                                ->title('Cierre de caja')
-                                ->body('La caja ha sido cerrada con éxito')
-                                ->success();
-                        }
-                    ),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make('Movement')
-                    ->icon('heroicon-o-inbox-arrow-down')
-                    ->fillForm(fn(CashRegister $record): array => [
-                        'user_id' => $record->user_id,
-                        'cash_register_id' => $record->id,
-                    ])
-                    ->form([
-                        Forms\Components\Hidden::make('cash_register_id')
-                            ->required(),
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\Select::make('type')
-                                    ->options(MovementType::class)
-                                    ->required()
-                                    ->native(false),
-                                Forms\Components\TextInput::make('amount')
-                                    ->required(),
-                            ])->columns(2),
-                        Forms\Components\Textarea::make('description'),
-                    ])
-                    ->action(function (array $data, CashRegister $record): void {
-                        CashMovement::create($data);
-                    })
-                    ->successNotification(
-                        Notification::make()
-                            ->success()
-                            ->title('Cash Movement'),
-                    ),
+                                ->success()
+                                ->title('Movimiento de Caja')
+                                ->body(
+                                    'Se ha registrado un movimiento de ' .
+                                        ($data['type'] === 'Entrada' ? 'Entrada' : 'Salida') .
+                                        ' por $' . number_format((float)$data['amount'], 2)
+                                )
+                                ->send();
+                        }),
+                    Tables\Actions\ViewAction::make()
+                        ->color('info'),
+                    Tables\Actions\EditAction::make()
+                        ->color('warning'),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\ForceDeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -178,9 +183,7 @@ class CashRegisterResource extends Resource
     public static function getRelations(): array
     {
         return [
-            CashMovementsRelationManager::class,
-            CashMovementsEntradaRelationManager::class,
-
+            //
         ];
     }
 
@@ -189,7 +192,16 @@ class CashRegisterResource extends Resource
         return [
             'index' => Pages\ListCashRegisters::route('/'),
             'create' => Pages\CreateCashRegister::route('/create'),
+            'view' => Pages\ViewCashRegister::route('/{record}'),
             'edit' => Pages\EditCashRegister::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }

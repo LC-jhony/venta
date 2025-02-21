@@ -12,8 +12,7 @@
         }
 
         * {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: small;
+            font-family: Verdana, Arial, sans-serif;
         }
 
         header {
@@ -29,66 +28,25 @@
         }
 
         /* Estilos para la tabla dentro del header */
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .header-table td {
-            vertical-align: top;
-            padding: 10px;
-        }
-
-        .header-table .left {
-            width: 60%;
-        }
-
-        .header-table .right {
-            width: 40%;
-            text-align: right;
-        }
-
-        .header-table img {
-            max-width: 150px;
-        }
-
-        .header-table p,
-        .header-table h4,
-        .header-table span {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .header-table h4 {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .header-table span {
-            font-size: 14px;
-            font-weight: bold;
-        }
 
         /*-----*/
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            rounded-border: 10px;
+        table {
+            font-size: x-small;
         }
 
-        .invoice-table th,
-        .invoice-table td {
+        .head th,
+        .body tr td {
+            padding: 4px;
             border: 1px solid #a5b1c2;
-            padding: 15px;
-
-            font-size: 14px;
         }
 
-        .invoice-table th {
-            background-color: #f3f3f3;
+        tfoot tr td {
             font-weight: bold;
-            text-transform: uppercase;
+            font-size: x-small;
+        }
+
+        .gray {
+            background-color: lightgray
         }
     </style>
 </head>

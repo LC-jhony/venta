@@ -4,9 +4,16 @@ namespace App\Filament\Resources\CashRegisterResource\Pages;
 
 use App\Filament\Resources\CashRegisterResource;
 use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\ViewRecord;
 
-class CreateCashRegister extends CreateRecord
+class ViewCashRegister extends ViewRecord
 {
     protected static string $resource = CashRegisterResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\EditAction::make(),
+        ];
+    }
 }

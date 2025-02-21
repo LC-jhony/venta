@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quote;
+use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class QuoteInvoice extends Controller
 {
     public function QuoteInvoice(Quote $quote)
     {
-        // dd($quote);
+        $setting = Setting::first();
         $pdf = Pdf::loadView(
             'pdf.invoice',
             [
@@ -18,7 +19,7 @@ class QuoteInvoice extends Controller
                     'user',
                     'supplier'
                 ),
-
+                'setting' => $setting
             ]
         );
 
