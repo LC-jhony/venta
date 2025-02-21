@@ -14,9 +14,13 @@ use App\Enum\CashMovement\MovementType;
 use Filament\Notifications\Notification;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
+use Symfony\Component\Console\Output\Output;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CashRegisterResource\Pages;
 use App\Filament\Resources\CashRegisterResource\RelationManagers;
+use App\Filament\Resources\CashRegisterResource\RelationManagers\InputsRelationManager;
+use App\Filament\Resources\CashRegisterResource\RelationManagers\OutputsRelationManager;
+use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsRelationManager;
 
 class CashRegisterResource extends Resource
 {
@@ -183,7 +187,9 @@ class CashRegisterResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            InputsRelationManager::class,
+            OutputsRelationManager::class,
+
         ];
     }
 
