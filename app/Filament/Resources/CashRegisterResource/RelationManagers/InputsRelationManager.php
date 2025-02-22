@@ -15,7 +15,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 class InputsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cashMovements';
-    protected static ?string $title = 'Entradas';
+    protected static ?string $title = 'Compras';
     protected function getTableQuery(): Builder
     {
         $query = parent::getTableQuery() ?? $this->getRelationship()->getQuery();
