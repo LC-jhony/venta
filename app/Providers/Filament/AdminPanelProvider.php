@@ -30,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('/')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Indigo,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->navigationGroups([
