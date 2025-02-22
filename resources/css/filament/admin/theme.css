@@ -4,6 +4,13 @@
 
 .fi-body {
     @apply bg-platinum;
+    width: 100%;
+    height: 100%;
+}
+
+/* Agregar estilos para el contenedor principal */
+.fi-main {
+    @apply max-w-[100rem] px-4 md:px-6 lg:px-8 xl:px-10 mx-auto w-full;
 }
 
 .fi-topbar>nav,
