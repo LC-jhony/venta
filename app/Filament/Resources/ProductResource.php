@@ -9,12 +9,16 @@ use Filament\Forms\Form;
 use App\Enum\TypeMeasure;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\Alignment;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\Layout\Grid;
+use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\ValidationException;
 use App\Filament\Resources\ProductResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Validation\ValidationException;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ProductResource extends Resource
 {
@@ -50,7 +54,7 @@ class ProductResource extends Resource
                   ->imageResizeMode('contain')
                   ->imageCropAspectRatio('3:2')
                   ->panelAspectRatio('3:2')
-                 // ->panelLayout('integrated')
+                  // ->panelLayout('integrated')
                   ->live()
                   ->validationMessages([
                     'image.max' => 'La imagen no debe pesar más de 2MB',
@@ -162,7 +166,7 @@ class ProductResource extends Resource
               ->label('Fecha de vencimiento')
               ->required()
               ->native(false)
-              ->validationMessages(['required' =>'La fecha de vencimiento debe ser una fecha válida']),
+              ->validationMessages(['required' => 'La fecha de vencimiento debe ser una fecha válida']),
           ])
           ->columns([
             'default' => 1,
@@ -181,6 +185,9 @@ class ProductResource extends Resource
       ->striped()
       ->paginated([5, 10, 25, 50, 100, 'all'])
       ->defaultPaginationPageOption(5)
+
+      ->searchable()
+
       ->columns([
         Tables\Columns\ImageColumn::make('image')
           ->label('Foto')
@@ -251,7 +258,6 @@ class ProductResource extends Resource
           ->dateTime()
           ->sortable()
           ->toggleable(isToggledHiddenByDefault: true),
-
       ])
       ->filters([
         SelectFilter::make('category_id')
@@ -316,6 +322,7 @@ class ProductResource extends Resource
       ])
       ->bulkActions([
         Tables\Actions\BulkActionGroup::make([
+          ExportBulkAction::make(),
           Tables\Actions\DeleteBulkAction::make(),
           Tables\Actions\ForceDeleteBulkAction::make(),
           Tables\Actions\RestoreBulkAction::make(),

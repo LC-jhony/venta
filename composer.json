@@ -26,7 +26,8 @@
         "owenvoke/blade-fontawesome": "^2.8",
         "pelmered/filament-money-field": "^1.4",
         "postare/blade-mdi": "^1.1",
-        "print-filament/print": "^1.3"
+        "print-filament/print": "^1.3",
+        "pxlrbt/filament-excel": "^2.4"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^2.0",
