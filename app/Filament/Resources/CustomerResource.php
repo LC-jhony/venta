@@ -19,6 +19,9 @@ class CustomerResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationGroup = 'Sistem POS';
+
+    protected static ?int $navigationSort = 1;
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();

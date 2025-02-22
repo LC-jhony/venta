@@ -21,6 +21,7 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationGroup = 'Sistem POS';
     protected static ?string $modelLabel = 'Categoría';
+    // protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {

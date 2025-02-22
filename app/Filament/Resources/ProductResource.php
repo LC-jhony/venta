@@ -28,6 +28,7 @@ class ProductResource extends Resource
 
   protected static ?string $navigationGroup = 'Sistem POS';
   protected static ?string $modelLabel = 'Producto';
+  // protected static ?int $navigationSort = 1;
 
   public static function form(Form $form): Form
   {
@@ -184,7 +185,7 @@ class ProductResource extends Resource
     return $table
       ->striped()
       ->paginated([5, 10, 25, 50, 100, 'all'])
-      ->defaultPaginationPageOption(5)
+      ->defaultPaginationPageOption(10)
 
       ->searchable()
 
@@ -260,6 +261,7 @@ class ProductResource extends Resource
           ->toggleable(isToggledHiddenByDefault: true),
       ])
       ->filters([
+        Tables\Filters\TrashedFilter::make(),
         SelectFilter::make('category_id')
           ->label('Categoria')
           ->relationship('category', 'name')

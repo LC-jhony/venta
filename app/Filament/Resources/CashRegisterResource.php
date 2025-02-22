@@ -27,6 +27,12 @@ class CashRegisterResource extends Resource
     protected static ?string $model = CashRegister::class;
 
     protected static ?string $navigationIcon = 'fas-cash-register';
+    protected static ?string $modelLabel = 'Caja';
+
+    protected static ?string $navigationGroup = 'Parchuse / Sale';
+
+
+    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
 
     public static function form(Form $form): Form
     {
