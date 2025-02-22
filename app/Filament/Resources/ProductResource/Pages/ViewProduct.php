@@ -65,8 +65,9 @@ class ViewProduct extends ViewRecord
                     '2xl' => 2,
                   ])
                   ->schema([
-                    Infolists\Components\TextEntry::make('bar_code')
-                      ->label('Codigo barra'),
+                    Infolists\Components\ViewEntry::make('bar_code')
+                      ->label('Codigo barra')
+                      ->view('infolists.components.product-bar-code'),
                     Infolists\Components\TextEntry::make('name')
                       ->label('Nombre'),
                     Infolists\Components\TextEntry::make('purchase_price')

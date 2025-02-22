@@ -76,7 +76,7 @@ class ProductResource extends Resource
                       ->required()
                       ->default(function () {
                         do {
-                          $barcode = str_pad(mt_rand(1, 999999999), 9, '0', STR_PAD_LEFT);
+                          $barcode = str_pad(mt_rand(1, 9999999999999), 13, '0', STR_PAD_LEFT);
                         } while (Product::where('bar_code', $barcode)->exists());
                         return $barcode;
                       })
