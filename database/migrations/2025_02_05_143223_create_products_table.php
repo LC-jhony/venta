@@ -23,7 +23,7 @@ return new class extends Migration
             $table->enum('unit_measure', ['Unidad', 'Kilo', 'Libra', 'Gramo', 'Litro', 'Mililitro', 'Metro', 'Pulgada', 'Rollo', 'Galon', 'Bolsa', 'Caja'])->nullable();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->boolean('status')->nullable();
-            $table->date('expiration');
+            $table->date('expiration')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');

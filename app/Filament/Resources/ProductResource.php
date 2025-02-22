@@ -21,6 +21,7 @@ class ProductResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-cube';
 
     protected static ?string $navigationGroup = 'Sistem POS';
+    protected static ?string $modelLabel = 'Producto';
 
     public static function form(Form $form): Form
     {
@@ -31,12 +32,25 @@ class ProductResource extends Resource
                         Forms\Components\Card::make()
                             ->schema([
                                 Forms\Components\FileUpload::make('image')
+                                    ->label('Foto')
+                                    ->required()
+                                    ->minSize(512)
+                                    ->maxSize(1024)
+                                    ->imageEditor()
                                     ->disk('public')
                                     ->directory('products')
                                     ->imageResizeMode('contain')
-                                    ->extraAttributes([
-                                        'class' => 'aspect-[3/2] w-[9.375rem] max-w-full',
+                                    ->imageCropAspectRatio('3:2')
+                                    ->panelAspectRatio('3:2')
+                                    ->panelLayout('integrated')
+                                    ->validationMessages([
+                                        'image.max' => 'La imagen no debe pesar más de 2MB',
+                                        'image' => 'La imagen debe ser un archivo de imagen válido (jpg, jpeg, png, bmp, gif, svg, or webp)',
+                                        'image' => 'La imagen es requerido'
                                     ]),
+                                // ->extraAttributes([
+                                //     'class' => 'aspect-[3/2] w-[9.375rem] max-w-full',
+                                // ]),
                             ])->columnSpan(1),
 
                         Forms\Components\Card::make()
@@ -44,7 +58,7 @@ class ProductResource extends Resource
                                 Forms\Components\Grid::make()
                                     ->schema([
                                         Forms\Components\TextInput::make('bar_code')
-                                            // ->label('Codigo barra')
+                                            ->label('Codigo barra')
                                             ->required()
                                             ->default(function () {
                                                 do {
@@ -56,10 +70,14 @@ class ProductResource extends Resource
                                             ->disabled()
                                             ->dehydrated(true),
                                         Forms\Components\TextInput::make('name')
-                                            //  ->label('Nombre')
-                                            ->required(),
+                                            ->label('Nombre')
+                                            ->required()
+                                            ->unique()
+                                            ->validationMessages([
+                                                'name' => 'El nombre es requerido',
+                                            ]),
                                         Forms\Components\TextInput::make('purchase_price')
-                                            // ->label('Precio de compra')
+                                            ->label('Precio de compra')
                                             ->required()
                                             ->live()
                                             ->afterStateUpdated(function ($state, callable $set) {
@@ -69,7 +87,8 @@ class ProductResource extends Resource
                                                 }
                                             }),
                                         Forms\Components\TextInput::make('sales_price')
-                                            // ->label('Precio de venta')
+                                            ->label('Precio de venta')
+                                            ->helperText(str('El precio de Venta  **es de 35%** de ganancia de la compra del producto.')->inlineMarkdown()->toHtmlString())
                                             ->required()
                                             ->live()
                                             ->disabled()
@@ -80,26 +99,26 @@ class ProductResource extends Resource
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\TextInput::make('stock')
-                            // ->label('Stock')
+                            ->label('Stock')
                             ->required(),
                         Forms\Components\TextInput::make('stock_minimum')
-                            // ->label('Stock minimo')
+                            ->label('Stock minimo')
                             ->required(),
                         Forms\Components\Select::make('unit_measure')
-                            // ->label('Unidad de medida')
+                            ->label('Unidad de medida')
                             ->options(TypeMeasure::class)
                             ->searchable()
                             ->preload()
                             ->required()
                             ->native(false),
                         Forms\Components\Select::make('category_id')
-                            // ->label('Categoria')
+                            ->label('Categoria')
                             ->relationship('category', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
                         Forms\Components\Select::make('status')
-                            // ->label('Estado')
+                            ->label('Estado')
                             ->required()
                             ->options([
                                 true => 'Activo',
@@ -107,7 +126,7 @@ class ProductResource extends Resource
                             ])
                             ->native(false),
                         Forms\Components\DatePicker::make('expiration')
-                            //  ->label('Fecha de vencimiento')
+                            ->label('Fecha de vencimiento')
                             ->required()
                             ->native(false),
                     ])->columns(2),
