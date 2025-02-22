@@ -17,6 +17,7 @@
         "codeat3/blade-google-material-design-icons": "^1.19",
         "codeat3/blade-line-awesome-icons": "^1.4",
         "codeat3/blade-solar-icons": "^1.1",
+        "eightynine/filament-excel-import": "^3.1",
         "filament/filament": "^3.2",
         "icetalker/filament-table-repeatable-entry": "^1.0",
         "jeffgreco13/filament-breezy": "^2.5",
