@@ -15,27 +15,27 @@ class Invoice extends Page
 
     public $quote;
 
-    public function mount($record)
-    {
-        $this->record = $record;
-        $this->quote = Quote::with('detailQuote.product')
-            ->find($record);
-    }
+    // public function mount($record)
+    // {
+    //     $this->record = $record;
+    //     $this->quote = Quote::with('quoteProducts.product')
+    //         ->find($record);
+    // }
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            Action::make('print')
-                ->icon('solar-printer-outline')
-                ->outlined()
-                ->url(
-                    route(
-                        'PRINT.INVOICE-QUOTE',
-                        ['quote' => $this->record]
-                    )
-                )->requiresConfirmation(),
-        ];
-    }
+    // protected function getHeaderActions(): array
+    // {
+    //     return [
+    //         Action::make('print')
+    //             ->icon('solar-printer-outline')
+    //             ->outlined()
+    //             ->url(
+    //                 route(
+    //                     'PRINT.INVOICE-QUOTE',
+    //                     ['quote' => $this->record]
+    //                 )
+    //             )->requiresConfirmation(),
+    //     ];
+    // }
 
     protected static string $view = 'filament.resources.quote-resource.pages.invoice';
 }

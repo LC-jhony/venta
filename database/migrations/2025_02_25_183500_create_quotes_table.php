@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('quotes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('supplier_id');
-            $table->string('serial_number');
-            $table->longText('notes');
+            $table->string('number_quote');
+            $table->text('notes');
+            $table->date('valid_date');
+            $table->boolean('status')->default(true);
+            $table->string('total');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
         });
     }
 

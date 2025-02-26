@@ -4,12 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DetailQuote extends Model
+class QuoteProduct extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
         'quote_id',
         'product_id',
@@ -17,20 +14,18 @@ class DetailQuote extends Model
         'price_unit',
         'total_price',
     ];
-
     public function quote(): BelongsTo
     {
         return $this->belongsTo(
-            related: Quote::class,
-            foreignKey: 'quote_id',
+            related:Quote::class,
+            foreignKey:'quote_id'
         );
     }
-
     public function product(): BelongsTo
     {
         return $this->belongsTo(
-            related: Product::class,
-            foreignKey: 'product_id',
+            related:Product::class,
+            foreignKey:'product_id'
         );
     }
 }

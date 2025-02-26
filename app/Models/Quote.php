@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\QuoteSupplier;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Quote extends Model
 {
@@ -13,15 +15,12 @@ class Quote extends Model
 
     protected $fillable = [
         'user_id',
-        'supplier_id',
-        'serial_number',
+        'number_quote',
         'notes',
+        'valid_date',
+        'status',
+        'total',
     ];
-
-    public function detailQuote(): HasMany
-    {
-        return $this->hasMany(DetailQuote::class);
-    }
 
     public function user(): BelongsTo
     {
@@ -30,12 +29,31 @@ class Quote extends Model
             foreignKey: 'user_id'
         );
     }
-
-    public function supplier(): BelongsTo
+    // public function supplier()
+    // {
+    //     return $this->belongsTo(Supplier::class);
+    // }
+    public function suppliers()
     {
-        return $this->belongsTo(
+        return $this->belongsToMany(
             related: Supplier::class,
-            foreignKey: 'supplier_id'
+            table: 'quote_suppliers',
+            foreignPivotKey: 'quote_id',
+            relatedPivotKey: 'supplier_id'
+        );
+    }
+
+    public function quoteProducts(): HasMany
+    {
+        return $this->hasMany(
+            QuoteProduct::class,
+        );
+    }
+
+    public function quoteSuppliers(): HasMany
+    {
+        return $this->hasMany(
+            related: QuoteSupplier::class,
         );
     }
 }

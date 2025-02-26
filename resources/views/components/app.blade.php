@@ -37,7 +37,7 @@
         .head th,
         .body tr td {
             padding: 4px;
-            border: 1px solid #a5b1c2;
+            border: 1px lightgray solid;
         }
 
         tfoot tr td {

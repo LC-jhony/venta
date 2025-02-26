@@ -41,4 +41,10 @@ class Supplier extends Model
             foreignKey: 'supplier_id',
         );
     }
+    public function quoteSuppliers(): HasMany
+    {
+        return $this->hasMany(
+            related: QuoteSupplier::class,
+        );
+    }
 }

@@ -31,7 +31,7 @@
         "pxlrbt/filament-excel": "^2.4"
     },
     "require-dev": {
-        "beyondcode/laravel-dump-server": "^2.0",
+        "beyondcode/laravel-dump-server": "^2.1",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.1",
         "laravel/pint": "^1.20",

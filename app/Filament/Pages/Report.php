@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class Report extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
+    protected static ?string $navigationIcon = 'lineawesome-file-pdf';
 
     protected static string $view = 'filament.pages.report';
     protected static ?string $navigationGroup = 'Systemm';
