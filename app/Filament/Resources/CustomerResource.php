@@ -36,7 +36,32 @@ class CustomerResource extends Resource
                     ->schema([
                         Forms\Components\Grid::make()
                             ->schema([
-                              w
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nombre')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('lastname')
+                                    ->label('Apellido')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('dni')
+                                    ->label('DNI')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('email')
+                                    ->label('Correo Electrónico')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('phone')
+                                    ->label('Teléfono | Celular')
+                                    ->tel()
+                                    ->required()
+                                    ->regex('/^\+?[0-9]{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/'),
+                                Forms\Components\TextInput::make('address')
+                                    ->label('Dirección')
+                                    ->required()
+                                    ->maxLength(255),
                             ])
                             ->columns([
                                 'default' => 1,

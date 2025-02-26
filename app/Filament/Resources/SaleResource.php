@@ -25,13 +25,14 @@ class SaleResource extends Resource
 {
     protected static ?string $model = Sale::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'gmdi-point-of-sale-tt';
 
     protected static ?string $navigationGroup = 'Parchuse / Sale';
 
     protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
 
-    protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
+    //protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
+    protected static ?string $modelLabel = "Venta";
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
@@ -47,6 +48,7 @@ class SaleResource extends Resource
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('code')
+                                    ->label('Codigo Barra')
                                     ->autofocus(true)
                                     ->suffixIcon('ri-barcode-line')
                                     ->live(onBlur: true)
@@ -86,6 +88,7 @@ class SaleResource extends Resource
                                         }
                                     }),
                                 Forms\Components\Select::make('customer_id')
+                                    ->label('Cliente')
                                     ->relationship('customer', 'name')
                                     ->required()
                                     ->searchable()
@@ -127,22 +130,32 @@ class SaleResource extends Resource
                                             ->modalHeading('Registrar Cliente')
                                             ->modalSubmitActionLabel('Crear')
                                             ->modalWidth('lg');
-                                    }),                     
+                                    }),
 
                                 Forms\Components\Select::make('user_id')
+                                    ->label('Usuario')
                                     ->relationship('user', 'name')
                                     ->default(Auth::id() ?? 1)
                                     ->required()
                                     ->disabled()
                                     ->dehydrated(),
                                 Forms\Components\TextInput::make('invoice_number')
-                                    ->default('INV-' . date('Ymd-His'))
+                                    ->label('Número de Factura')
+                                    ->default('FAC-' . now()->format('Y') . '-' . rand(1000, 999999))
                                     ->required()
-                                    ->maxLength(255),
-                            ])->columns(4),
+                                    ->unique(Sale::class, 'invoice_number', ignoreRecord: true)
+                                    ->disabled()
+                                    ->dehydrated(),
+                            ])->columns([
+                                'default' => 1,
+                                'sm' => 2,
+                                'md' => 3,
+                                'lg' => 4,
+                            ]),
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\Textarea::make('notes')
+                                    ->label('Notas')
                                     ->columnSpanFull(),
                             ])->columns(3),
                     ]),
@@ -160,10 +173,10 @@ class SaleResource extends Resource
                                         self::calculateSaleTotals($details, $set);
                                     })
                                     ->headers([
-                                        Header::make('description'),
-                                        Header::make('quantity')->width('90px'),
-                                        Header::make('Price Unit')->width('90px'),
-                                        Header::make('total')->width('90px'),
+                                        Header::make('Descripcion'),
+                                        Header::make('Cantidad')->width('90px'),
+                                        Header::make('Pre. Unitario')->width('90px'),
+                                        Header::make('Total')->width('90px'),
                                     ])
                                     ->schema([
                                         Forms\Components\Select::make('product_id')
@@ -193,46 +206,40 @@ class SaleResource extends Resource
                                             ->disabled()
                                             ->dehydrated(true),
                                     ])
+                                    ->emptyLabel('Seleccione un producto')
                                     ->defaultItems(0)
                                     ->reorderable()
                                     ->columnSpan('full'),
-                            ])->columnSpan(8),
+                            ])->columnSpan([
+                                'default' => 'full',
+                                'md' => 8,
+                                'lg' => 9,
+                            ]),
 
                         Forms\Components\Grid::make()
                             ->schema([
-                                // Forms\Components\Section::make('Payment Details')
-                                //     ->schema([
-                                //         MoneyInput::make('paid_amount')
-                                //             ->required()
-                                //             ->numeric()
-                                //             ->reactive()
-                                //             ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                //                 $paidAmount = floatval($state); // Convertir a número
-                                //                 $total = floatval($get('total') ?? 0); // Obtener total o 0 si es null
-                                //                 $change = max($paidAmount - $total, 0); // Asegurar que no sea negativo
-                                //                 $set('change_amount', number_format($change, 2, '.', ',')); // Establecer el cambio
-                                //             }),
-                                //         MoneyInput::make('change_amount')
-                                //             ->required()
-                                //             ->disabled()
-                                //             ->dehydrated(true)
-                                //             ->numeric()
-                                //             ->live(),
-                                //     ]),
-                                Forms\Components\Section::make('totales')
+                                Forms\Components\Section::make('Totales')
                                     ->schema([
                                         Forms\Components\TextInput::make('subtotal')
+                                            ->label('Subtotal')
                                             ->disabled()
                                             ->dehydrated(true),
                                         Forms\Components\TextInput::make('tax')
+                                            ->label('IGV')
+                                            ->helperText(str('Impuesto del **18%** del sub Total.')->inlineMarkdown()->toHtmlString())
                                             ->disabled()
                                             ->dehydrated(true),
                                         Forms\Components\TextInput::make('total')
+                                            ->label('Total')
                                             ->disabled()
                                             ->dehydrated(true),
                                     ]),
 
-                            ])->columnSpan(4),
+                            ])->columnSpan([
+                                'default' => 'full',
+                                'md' => 4,
+                                'lg' => 3,
+                            ]),
                     ])
                     ->columns(12),
 

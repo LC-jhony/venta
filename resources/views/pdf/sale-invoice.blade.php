@@ -27,19 +27,20 @@
                 <!-- Columna Izquierda: Título "Invoice" -->
                 <td style="width: 60%; text-align: left;">
                     <h4
-                        style="font-size: 3.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">
-                        Invoice
+                        style="font-size: 2.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">
+                        
+                        factura
                     </h4>
                 </td>
 
                 <!-- Columna Derecha: Invoice # y Fecha -->
                 <td style="width: 40%; text-align: right; vertical-align: top;">
                     <strong style="font-size: 16px; font-weight: 600; margin: 0;">
-                        Invoice #
+                        N°
                         <span style="padding-left: 0.5rem; font-size:14px;">{{ $sale->invoice_number }}</span>
                     </strong>
                     <p style="font-size: 16px; font-weight: 600; margin: 0;">
-                        Date: <span
+                        Fecha: <span
                             style="padding-left: 0.5rem; font-size:14px;">{{ $sale->created_at->format('d/m/Y') }}</span>
                     </p>
                 </td>
@@ -47,60 +48,15 @@
         </table>
     </div>
     <div>
-        {{-- <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th style="text-align: left;">Product Description</th>
-                    <th>Price</th>
-                    <th>Qty</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
 
-            <tbody>
-                @foreach ($sale->saleDetails as $index => $item)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td style="text-align: left;">{{ $item->product->name }}</td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>{{ $item->unit_price }}</td>
-                        <td>{{ $item->total_price }}</td>
-                    </tr>
-                @endforeach
-
-                <tr>
-                    <td colspan="3" rowspan="3" style="padding: 10px; border-top: 1px solid #ddd;">
-                        {{ $sale->notes }}</td>
-                    <td style="text-align: right; background-color: #f3f3f3; padding: 8px; font-weight: 600;">
-                        Sub Total:
-                    </td>
-                    <td style="padding: 8px; border-top: 1px solid #ddd;">{{ $sale->subtotal, 2, ',', '.' }}</td>
-                </tr>
-                <tr>
-
-                    <td style="text-align: right; background-color: #f3f3f3; padding: 8px; font-weight: 600;">
-                        IGV (18%):
-                    </td>
-                    <td style="padding: 8px;">{{ number_format($sale->tax, 2, ',', '.') }}</td>
-                </tr>
-                <tr>
-
-                    <td style="text-align: right; background-color: #f3f3f3; padding: 8px; font-weight: 600;">
-                        Total:
-                    </td>
-                    <td style="padding: 8px; font-weight: bold;">{{ number_format($sale->total, 2, ',', '.') }}</td>
-                </tr>
-            </tbody>
-        </table> --}}
         <table width="100%" style="border-collapse: collapse;">
             <thead class="head" style="background-color: lightgray;">
                 <tr>
                     <th>#</th>
-                    <th style="text-align: left;">Description</th>
-                    <th>Quantity</th>
-                    <th>Unit Price $</th>
-                    <th>Total $</th>
+                    <th style="text-align: left;">Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Pre. Unitario</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody class="body">
@@ -117,17 +73,17 @@
             <tfoot>
                 <tr>
                     <td colspan="3"></td>
-                    <td align="right">Subtotal $</td>
+                    <td align="right">Subtotal S/. </td>
                     <td align="right">{{ $sale->subtotal, 2, ',', '.' }}</td>
                 </tr>
                 <tr>
                     <td colspan="3"></td>
-                    <td align="right">Tax $ (18%)</td>
+                    <td align="right">IGV (18%)</td>
                     <td align="right">{{ number_format($sale->tax, 2, ',', '.') }}</td>
                 </tr>
                 <tr>
                     <td colspan="3"></td>
-                    <td align="right">Total $</td>
+                    <td align="right">Total S/.</td>
                     <td align="right" class="gray">{{ number_format($sale->total, 2, ',', '.') }}</td>
                 </tr>
             </tfoot>

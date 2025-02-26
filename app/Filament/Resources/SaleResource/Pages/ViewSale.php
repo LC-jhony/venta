@@ -40,31 +40,32 @@ class ViewSale extends ViewRecord
     {
         return $infolist
             ->schema([
-                Section::make()
+                Section::make('Detalles de Venta')
                     ->schema([
-                        Section::make()
+                        Grid::make()
                             ->schema([
                                 Grid::make()
                                     ->schema([
                                         TextEntry::make('customer.name')
-                                            ->label(__('Customer')),
+                                            ->label('Cliente'),
                                         TextEntry::make('user.name')
-                                            ->label(__('User')),
+                                            ->label('Usuario'),
                                         TextEntry::make('invoice_number')
-                                            ->label(__('Invoice')),
-                                        // TextEntry::make('created_at'),
+                                            ->label('Factura'),
                                     ])
-                                    ->columns(3),
+                                    ->columns([
+                                        'default' => 1,
+                                        'sm' => 2,
+                                        'md' => 3,
+                                        'lg' => 3,
+                                    ]),
                                 Card::make()
                                     ->schema([
-                                        TextEntry::make('payment_method')
-                                            ->label(__('Method')),
-                                        TextEntry::make('payment_status')
-                                            ->label(__('Status')),
-                                        TextEntry::make('sale_status')
-                                            ->label(__('Sale Status')),
+                                        TextEntry::make('notes')
+                                            ->label('Nota')
+                                            ->columnSpanFull(),
                                     ])
-                                    ->columns(3),
+                                    ->columns(1),
                             ]),
                         Group::make()
                             ->columnSpanFull()
@@ -75,42 +76,48 @@ class ViewSale extends ViewRecord
                                             ->label('')
                                             ->schema([
                                                 TextEntry::make('product.name')
-                                                    ->label(__('Description')),
+                                                    ->label('Descripción'),
                                                 TextEntry::make('quantity')
-                                                    ->label(__('Quantity')),
+                                                    ->label('Cantidad'),
                                                 TextEntry::make('unit_price')
-                                                    ->label(__('Price Unit')),
+                                                    ->label('Pre. Unitario')
+                                                    ->money(),
                                                 TextEntry::make('total_price')
-                                                    ->label(__('Total Price')),
+                                                    ->label('Total')
+                                                    ->money(),
                                             ])
                                             ->striped()
                                             ->columnSpan('full'),
-                                    ])->columnSpan(10),
+                                    ])
+                                    ->columnSpan([
+                                        'default' => 'full',
+                                        'md' => 8,
+                                        'lg' => 9,
+                                    ]),
 
                                 Grid::make()
                                     ->schema([
-                                        Card::make()
+                                        Card::make('Resumen')
                                             ->schema([
                                                 TextEntry::make('subtotal')
-                                                    ->label(__('Sub Total')),
+                                                    ->label(__('Sub Total'))
+                                                    ->money('usd', true),
                                                 TextEntry::make('tax')
-                                                    ->label(__('IGV')),
-                                                MoneyEntry::make('total')
+                                                    ->label(__('IGV'))
+                                                    ->money('usd', true),
+                                                TextEntry::make('total')
                                                     ->label(__('Total'))
-                                                    ->currency('PEN')
-                                                    ->locale('es_ES')
-                                                    ->decimals(2),
+                                                    ->money('usd', true)
+                                                    ->weight('bold'),
                                             ]),
-                                    ])->columnSpan(2),
+                                    ])
+                                    ->columnSpan([
+                                        'default' => 'full',
+                                        'md' => 4,
+                                        'lg' => 3,
+                                    ]),
                             ])
                             ->columns(12),
-                        Card::make()
-                            ->schema([
-                                TextEntry::make('notes')
-                                    ->label(__('Notes'))
-                                    ->columnSpanFull(),
-                            ]),
-
                     ]),
             ]);
     }
