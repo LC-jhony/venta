@@ -5,6 +5,7 @@ namespace App\Filament\Resources\SaleResource\Pages;
 use App\Filament\Resources\SaleResource;
 use App\Models\CashMovement;
 use App\Models\CashRegister;
+use App\Models\Product;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -22,6 +23,7 @@ class CreateSale extends CreateRecord
     protected function afterCreate(): void
     {
         $this->createCashRegisterTotal();
+        $this->updateProductStock();
     }
 
     private function validateCashRegisterStatus(): void
@@ -52,15 +54,23 @@ class CreateSale extends CreateRecord
         if (! $cashRegister) {
             return;
         }
-
         CashMovement::create([
             'cash_register_id' => $cashRegister->id,
             'type' => 'Salida',
             'amount' => $this->record->total,
-
         ]);
     }
-
+    private function updateProductStock(): void
+    {
+        $sale = $this->record;
+        foreach ($sale->saleDetails as $detail) {
+            $product = Product::find($detail->product_id);
+            if ($product) {
+                $product->stock -= $detail->quantity;
+                $product->save();
+            }
+        }
+    }
     private function notifyCashRegisterRequired(): void
     {
 

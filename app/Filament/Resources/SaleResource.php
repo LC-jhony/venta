@@ -2,23 +2,25 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SaleResource\Pages;
-use App\Models\Product;
-use App\Models\Sale;
-use Awcodes\TableRepeater\Components\TableRepeater;
-use Awcodes\TableRepeater\Header;
 use Filament\Forms;
-use Filament\Forms\Form;
+use App\Models\Sale;
+use Filament\Tables;
+use App\Models\Product;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Forms\Form;
+use App\Models\SaleDetail;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\Resource;
+use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Forms\Components\Actions\Action;
+use App\Filament\Resources\SaleResource\Pages;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
 
 class SaleResource extends Resource
@@ -194,6 +196,20 @@ class SaleResource extends Resource
                                             ->afterStateUpdated(function ($state, callable $set, Get $get) {
                                                 self::calculateLineTotal($state, $get('product_id'), $set);
                                                 self::calculateSaleTotals($get('../'), $set);
+                                                $productId = $get('product_id');
+
+                                                if ($productId && $state) {
+                                                    $product = Product::find($productId);
+                                                    if ($state > $product->stock) {
+                                                        Notification::make()
+                                                            ->title('Error')
+                                                            ->body("Solo hay {$product->stock} unidades disponibles")
+                                                            ->danger()
+                                                            ->send();
+                                                        $set('quantity', $product->stock);
+                                                        return;
+                                                    }
+                                                }
                                             }),
 
                                         Forms\Components\TextInput::make('unit_price')
