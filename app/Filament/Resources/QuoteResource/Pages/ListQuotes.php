@@ -13,7 +13,9 @@ class ListQuotes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label('Crear Cotización')
+                ->icon('heroicon-o-squares-plus'),
         ];
     }
 }

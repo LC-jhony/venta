@@ -20,6 +20,8 @@ class CustomerResource extends Resource
 
     protected static ?string $navigationGroup = 'Sistem POS';
 
+    protected static ?string $modelLabel = 'Clientes';
+
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationBadge(): ?string
@@ -30,26 +32,20 @@ class CustomerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('lastname')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('dni')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->required()
-                    ->regex('/^\+?[0-9]{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/'),
-                Forms\Components\TextInput::make('address')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Section::make('Información del Cliente')
+                    ->schema([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                              w
+                            ])
+                            ->columns([
+                                'default' => 1,
+                                'sm' => 1,
+                                'md' => 2,
+                                'lg' => 3,
+                                'xl' => 3,
+                            ])
+                    ])
             ]);
     }
 

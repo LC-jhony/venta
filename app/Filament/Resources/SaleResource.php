@@ -18,6 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Actions\Action;
 use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
 
 class SaleResource extends Resource
@@ -89,7 +90,45 @@ class SaleResource extends Resource
                                     ->required()
                                     ->searchable()
                                     ->preload()
-                                    ->native(false),
+                                    ->native(false)
+                                    ->createOptionForm([
+                                        Forms\Components\Grid::make()
+                                            ->schema([
+                                                Forms\Components\TextInput::make('name')
+                                                    ->label('Nombre')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('lastname')
+                                                    ->label('Apellido')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('dni')
+                                                    ->label('DNI')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('email')
+                                                    ->label('Correo Electrónico')
+                                                    ->email()
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Forms\Components\TextInput::make('phone')
+                                                    ->label('Teléfono | Celular')
+                                                    ->tel()
+                                                    ->required()
+                                                    ->regex('/^\+?[0-9]{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/'),
+                                                Forms\Components\TextInput::make('address')
+                                                    ->label('Dirección')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                    ])
+                                    ->createOptionAction(function (Action $action) {
+                                        return $action
+                                            ->modalHeading('Registrar Cliente')
+                                            ->modalSubmitActionLabel('Crear')
+                                            ->modalWidth('lg');
+                                    }),                     
+
                                 Forms\Components\Select::make('user_id')
                                     ->relationship('user', 'name')
                                     ->default(Auth::id() ?? 1)

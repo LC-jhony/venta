@@ -25,6 +25,7 @@ class QuoteResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
 
     protected static ?string $navigationGroup = 'Sistem POS';
+    protected static ?string $modelLabel = 'Cotizacióne';
 
     public static function getNavigationBadge(): ?string
     {
@@ -78,7 +79,7 @@ class QuoteResource extends Resource
                                 'lg' => 3,
                             ]),
                     ]),
-                
+
                 Forms\Components\Section::make('Detalles de la Cotización')
                     ->schema([
                         Forms\Components\Grid::make()
@@ -178,14 +179,14 @@ class QuoteResource extends Resource
                                             ->native(false),
                                     ])
                                     ->columnSpan([
-                                        'default' => 'full',                                                                     
-                                         'md' => 4,
-                                         'lg' => 3,
+                                        'default' => 'full',
+                                        'md' => 4,
+                                        'lg' => 3,
                                     ]),
                             ])
                             ->columns(12),
                     ]),
-                
+
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Textarea::make('notes')
@@ -224,30 +225,69 @@ class QuoteResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label('Usuario')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('number_quote')
+                    ->label('Codigo')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('valid_date')
+                    ->label('Fecha de vencimiento')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
+                    ->label('Total')
+                    ->money()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('status')
+                    ->label('Estado')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Actualizado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label('Eliminado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Estado')
+                    ->options([
+                        '1' => 'Aceptado',
+                        '0' => 'Rechazado',
+                    ]),
+                Tables\Filters\SelectFilter::make('suppliers')
+                    ->label('Proveedor')
+                    ->relationship('suppliers', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->native(false),
+                Tables\Filters\SelectFilter::make('user_id')
+                    ->label('Usuario')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->native(false),
+                Tables\Filters\Filter::make('valid_date')
+                    ->label('Fecha de vencimiento')
+                    ->form([
+                        Forms\Components\DatePicker::make('valid_date'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                        ->when(
+                            $data['valid_date'],
+                            fn(Builder $query, $date): Builder => $query->whereDate('valid_date', $date)
+                        );
+                    }),
             ])
             ->actions([
 
@@ -257,17 +297,17 @@ class QuoteResource extends Resource
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\Action::make('pdf')
-                ->label('Pdf')
-                ->icon('lineawesome-file-pdf')
-                ->url(fn($record): string => route('QUOTE-INVOICE', $record->id))
-                ->openUrlInNewTab()
+                    ->label('Pdf')
+                    ->icon('lineawesome-file-pdf')
+                    ->url(fn($record): string => route('QUOTE-INVOICE', $record->id))
+                    ->openUrlInNewTab()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
-                
+
                 ]),
             ]);
     }

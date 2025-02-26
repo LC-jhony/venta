@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\QuoteResource\Pages;
 
-use App\Filament\Resources\QuoteResource;
 use App\Mail\QuoteShipped;
-use Filament\Notifications\Notification;
-use Filament\Resources\Pages\CreateRecord;
+use App\Mail\QuoteShippedMail;
 use Illuminate\Support\Facades\Mail;
+use Filament\Notifications\Notification;
+use App\Filament\Resources\QuoteResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateQuote extends CreateRecord
 {
@@ -15,41 +16,45 @@ class CreateQuote extends CreateRecord
     protected function afterCreate(): void
     {
         $quote = $this->record;
-
-        // Verificar si el estado es "Aceptado" (1)
-        if ($quote->status == '1') {
-            // Obtener los proveedores seleccionados
-            $suppliers = $quote->suppliers;
-
-            if ($suppliers->count() > 0) {
-                foreach ($suppliers as $supplier) {
-                    // Verificar que el proveedor tenga un correo electrónico
-                    if ($supplier->email) {
-                        try {
-                            // Enviar correo electrónico al proveedor
-                            Mail::to($supplier->email)
-                                ->send(new QuoteShipped($quote, $supplier));
-                        } catch (\Exception $e) {
-                            // Registrar el error pero continuar con los demás proveedores
-                            \Log::error('Error al enviar correo a proveedor: '.$e->getMessage());
-
-                            // Notificar al usuario sobre el error
-                            Notification::make()
-                                ->title('Error al enviar correo')
-                                ->body('No se pudo enviar el correo a '.$supplier->name.': '.$e->getMessage())
-                                ->danger()
-                                ->send();
-                        }
-                    }
+        
+        if ($quote->status) {
+            // Cargar la relación de proveedores
+            $quote->load('suppliers');
+            
+            // Verificar si hay proveedores asociados
+            if ($quote->suppliers->isNotEmpty()) {
+                // Obtener todos los correos de los proveedores
+                $supplierEmails = $quote->suppliers->pluck('email')->filter()->toArray();
+                
+                if (!empty($supplierEmails)) {
+                    // Enviar correo a todos los proveedores seleccionados
+                    Mail::to($supplierEmails)->send(new QuoteShippedMail($quote));
+                    
+                    Notification::make()
+                        ->title('Correo enviado')
+                        ->body('Se ha enviado la cotización por correo electrónico a ' . count($supplierEmails) . ' proveedores.')
+                        ->success()
+                        ->send();
+                } else {
+                    Notification::make()
+                        ->title('No se pudo enviar el correo')
+                        ->body('Los proveedores seleccionados no tienen correos electrónicos registrados.')
+                        ->warning()
+                        ->send();
                 }
-
-                // Notificar al usuario que los correos fueron enviados
+            } else {
                 Notification::make()
-                    ->title('Correos enviados')
-                    ->body('Se han enviado correos electrónicos a los proveedores seleccionados.')
-                    ->success()
+                    ->title('No se pudo enviar el correo')
+                    ->body('No hay proveedores asociados a esta cotización.')
+                    ->warning()
                     ->send();
             }
+        } else {
+            Notification::make()
+                ->title('Cotización guardada')
+                ->body('La cotización ha sido guardada pero no se ha enviado por correo porque está inactiva.')
+                ->info()
+                ->send();
         }
     }
 
