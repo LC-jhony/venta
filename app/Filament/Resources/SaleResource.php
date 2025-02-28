@@ -296,44 +296,62 @@ class SaleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
+            ->paginated([5, 10, 25, 50, 100, 'all'])
+            ->defaultPaginationPageOption(5)
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label('Usuario')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer.name')
+                    ->label('Cliente')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('invoice_number')
+                    ->label('Factura')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('subtotal')
-                    ->numeric()
+                    ->label('Sub. Total')
+                    ->money('S/.')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tax')
-                    ->numeric()
+                    ->label('IGV 18%')
+                    ->money('S/.')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->numeric()
-                    ->summarize(Sum::make()),
+                    ->label('Total')
+                    ->money('S/.')
+                    ->summarize(Sum::make()->money('S/.')),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Actualizado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label('Eliminado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('invoice')
+                    ->label('PDF')
+                    ->icon('lineawesome-file-pdf')
+                    ->url(fn($record): string => route('PRINT.INVOICE-SALE', $record->id))
+                    ->openUrlInNewTab(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
             ])

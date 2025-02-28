@@ -106,6 +106,9 @@ class SuppliersResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->striped()
+        ->paginated([5, 10, 25, 50, 100, 'all'])
+        ->defaultPaginationPageOption(5)
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                 ->label('Nombre')

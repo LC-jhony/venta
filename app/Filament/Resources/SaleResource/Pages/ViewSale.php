@@ -32,7 +32,8 @@ class ViewSale extends ViewRecord
                         'PRINT.INVOICE-SALE',
                         ['sale' => $this->record]
                     )
-                ),
+                )
+                ->openUrlInNewTab(),
         ];
     }
 
