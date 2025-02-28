@@ -13,7 +13,6 @@ use Filament\Infolists\Infolist;
 use Filament\Pages\Actions\Action;
 use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
-use Pelmered\FilamentMoneyField\Infolists\Components\MoneyEntry;
 
 class ViewSale extends ViewRecord
 {
@@ -82,10 +81,10 @@ class ViewSale extends ViewRecord
                                                     ->label('Cantidad'),
                                                 TextEntry::make('unit_price')
                                                     ->label('Pre. Unitario')
-                                                    ->money(),
+                                                    ->money('S/.'),
                                                 TextEntry::make('total_price')
                                                     ->label('Total')
-                                                    ->money(),
+                                                    ->money('S/.'),
                                             ])
                                             ->striped()
                                             ->columnSpan('full'),
@@ -101,14 +100,14 @@ class ViewSale extends ViewRecord
                                         Card::make('Resumen')
                                             ->schema([
                                                 TextEntry::make('subtotal')
-                                                    ->label(__('Sub Total'))
-                                                    ->money('usd', true),
+                                                    ->label('Sub Total')
+                                                    ->money('S/.', true),
                                                 TextEntry::make('tax')
-                                                    ->label(__('IGV'))
-                                                    ->money('usd', true),
+                                                    ->label('IGV')
+                                                    ->money('S/.', true),
                                                 TextEntry::make('total')
-                                                    ->label(__('Total'))
-                                                    ->money('usd', true)
+                                                    ->label('Total')
+                                                    ->money('S/.', true)
                                                     ->weight('bold'),
                                             ]),
                                     ])

@@ -14,7 +14,7 @@ class ListQuotes extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-            ->label('Crear Cotización')
+                ->label('Crear Cotización')
                 ->icon('heroicon-o-squares-plus'),
         ];
     }

@@ -2,24 +2,27 @@
 
 namespace App\Filament\Resources\CashRegisterResource\RelationManagers;
 
-use Filament\Tables;
-use Filament\Forms\Form;
 use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Columns\Summarizers\Sum;
-use Filament\Resources\RelationManagers\RelationManager;
 
-class OutputsRelationManager extends  RelationManager
+class OutputsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cashMovements';
+
     protected static ?string $title = 'Ventas';
+
     protected function getTableQuery(): Builder
     {
         $query = parent::getTableQuery() ?? $this->getRelationship()->getQuery();
 
         return $query->where('type', 'Salida');
     }
+
     public function form(Form $form): Form
     {
 
@@ -33,9 +36,10 @@ class OutputsRelationManager extends  RelationManager
                 Forms\Components\TextInput::make('amount')
                     ->required(),
                 Forms\Components\Textarea::make('description')
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
             ]);
     }
+
     public function table(Table $table): Table
     {
         return $table

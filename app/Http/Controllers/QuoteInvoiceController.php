@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Quote;
 use App\Models\Setting;
-use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class QuoteInvoiceController extends Controller
 {
@@ -23,7 +23,7 @@ class QuoteInvoiceController extends Controller
                     'user',
                     'suppliers'
                 ),
-                'setting' => $setting
+                'setting' => $setting,
             ]
         );
 

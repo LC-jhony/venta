@@ -2,15 +2,14 @@
 
 namespace App\Filament\Resources\QuoteResource\Pages;
 
+use App\Filament\Resources\QuoteResource;
 use Filament\Actions;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Actions\Action;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Infolists\Components\Split;
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\QuoteResource;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
+use Illuminate\Database\Eloquent\Model;
 
 class ViewQuote extends ViewRecord
 {
@@ -23,21 +22,23 @@ class ViewQuote extends ViewRecord
             Action::make('print')
                 ->icon('fluentui-print-48-o')
                 ->outlined()
-                ->url(fn($record): string => route('QUOTE-INVOICE', $record->id))
-              
+                ->url(fn ($record): string => route('QUOTE-INVOICE', $record->id)),
+
         ];
     }
+
     public function getRecord(): Model
     {
         $record = parent::getRecord();
 
         // Asegurarse de que la relación suppliers esté cargada
-        if (!$record->relationLoaded('suppliers')) {
+        if (! $record->relationLoaded('suppliers')) {
             $record->load('suppliers');
         }
 
         return $record;
     }
+
     public function infolist(Infolist $infolist): Infolist
     {
         return $infolist

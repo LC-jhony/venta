@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\SaleResource\Pages;
 
-use Filament\Actions;
-use App\Models\Product;
-use App\Models\SaleDetail;
 use App\Filament\Resources\SaleResource;
-use Filament\Resources\Pages\EditRecord;
+use App\Models\Product;
+use Filament\Actions;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 
 class EditSale extends EditRecord
 {
@@ -47,7 +46,9 @@ class EditSale extends EditRecord
 
         foreach ($newDetails as $detail) {
             $product = Product::find($detail->product_id);
-            if (!$product) continue;
+            if (! $product) {
+                continue;
+            }
 
             // Obtener la cantidad original (si existía)
             $originalQuantity = $originalDetailsMap->get($detail->product_id)?->quantity ?? 0;
@@ -62,6 +63,7 @@ class EditSale extends EditRecord
                         ->body("Stock insuficiente para el producto {$product->name}")
                         ->danger()
                         ->send();
+
                     continue;
                 }
 
@@ -72,7 +74,7 @@ class EditSale extends EditRecord
 
         // Manejar productos eliminados (devolver stock)
         foreach ($this->originalDetails as $originalDetail) {
-            if (!$newDetails->contains('product_id', $originalDetail->product_id)) {
+            if (! $newDetails->contains('product_id', $originalDetail->product_id)) {
                 $product = Product::find($originalDetail->product_id);
                 if ($product) {
                     $product->stock += $originalDetail->quantity;

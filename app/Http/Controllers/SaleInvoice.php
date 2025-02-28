@@ -19,7 +19,7 @@ class SaleInvoice extends Controller
                     'customer',
                     'user'
                 ),
-                'setting' => $setting
+                'setting' => $setting,
             ]
         );
 

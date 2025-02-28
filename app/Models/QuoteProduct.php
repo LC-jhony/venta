@@ -14,18 +14,20 @@ class QuoteProduct extends Model
         'price_unit',
         'total_price',
     ];
+
     public function quote(): BelongsTo
     {
         return $this->belongsTo(
-            related:Quote::class,
-            foreignKey:'quote_id'
+            related: Quote::class,
+            foreignKey: 'quote_id'
         );
     }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(
-            related:Product::class,
-            foreignKey:'product_id'
+            related: Product::class,
+            foreignKey: 'product_id'
         );
     }
 }

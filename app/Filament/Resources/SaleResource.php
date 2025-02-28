@@ -13,11 +13,11 @@ use App\Models\SaleDetail;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
+use Filament\Forms\Components\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Columns\Summarizers\Sum;
-use Filament\Forms\Components\Actions\Action;
 use App\Filament\Resources\SaleResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -33,7 +33,7 @@ class SaleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
 
-    //protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
+    //protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; 
     protected static ?string $modelLabel = "Venta";
     public static function getNavigationBadge(): ?string
     {

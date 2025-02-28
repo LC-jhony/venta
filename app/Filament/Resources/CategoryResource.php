@@ -20,6 +20,7 @@ class CategoryResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $navigationGroup = 'Sistem POS';
+
     protected static ?string $modelLabel = 'Categoría';
     // protected static ?int $navigationSort = 1;
 
@@ -43,7 +44,7 @@ class CategoryResource extends Resource
                             ->unique()
                             ->validationMessages([
                                 'required' => 'El nombre de la categoría es requerido.',
-                                'unique' => 'El nombre de la categoría ya existe.'
+                                'unique' => 'El nombre de la categoría ya existe.',
                             ]),
                         Forms\Components\Select::make('status')
                             ->label('Estado')
@@ -61,8 +62,7 @@ class CategoryResource extends Resource
                             ->label('Descripción')
                             ->columnSpanFull(),
 
-                    ])
-
+                    ]),
 
             ]);
     }
@@ -124,7 +124,7 @@ class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ProductsRelationManager::class
+            ProductsRelationManager::class,
         ];
     }
 

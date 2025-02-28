@@ -2,35 +2,32 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Models\CashMovement;
-use App\Models\CashRegister;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Auth;
 use App\Enum\CashMovement\MovementType;
-use Filament\Notifications\Notification;
-use Filament\Tables\Actions\ActionGroup;
-use Illuminate\Database\Eloquent\Builder;
-use Symfony\Component\Console\Output\Output;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CashRegisterResource\Pages;
-use App\Filament\Resources\CashRegisterResource\RelationManagers;
 use App\Filament\Resources\CashRegisterResource\RelationManagers\InputsRelationManager;
 use App\Filament\Resources\CashRegisterResource\RelationManagers\OutputsRelationManager;
-use App\Filament\Resources\CashRegisterResource\RelationManagers\CashMovementsRelationManager;
+use App\Models\CashMovement;
+use App\Models\CashRegister;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class CashRegisterResource extends Resource
 {
     protected static ?string $model = CashRegister::class;
 
     protected static ?string $navigationIcon = 'fas-cash-register';
+
     protected static ?string $modelLabel = 'Caja';
 
     protected static ?string $navigationGroup = 'Parchuse / Sale';
-
 
     protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
 
@@ -65,7 +62,7 @@ class CashRegisterResource extends Resource
                         Forms\Components\Toggle::make('status')
                             ->required()
                             ->default(true)
-                            ->disabled(fn($record) => $record && ! $record->status),
+                            ->disabled(fn ($record) => $record && ! $record->status),
                     ])->columns(3),
             ]);
     }
@@ -122,7 +119,7 @@ class CashRegisterResource extends Resource
                         ->requiresConfirmation()
                         ->color('danger')
                         ->icon('fas-lock')
-                        ->visible(fn($record) => $record->status)
+                        ->visible(fn ($record) => $record->status)
                         ->action(function (CashRegister $record) {
                             $totalOutput = $record->cashMovements()
                                 ->where('type', 'Salida')
@@ -140,8 +137,8 @@ class CashRegisterResource extends Resource
                     Tables\Actions\Action::make('Movement')
                         ->color('success')
                         ->icon('heroicon-o-inbox-arrow-down')
-                        ->visible(fn($record) => $record->status)
-                        ->fillForm(fn(CashRegister $record): array => [
+                        ->visible(fn ($record) => $record->status)
+                        ->fillForm(fn (CashRegister $record): array => [
                             'user_id' => $record->user_id,
                             'cash_register_id' => $record->id,
                         ])
@@ -166,9 +163,9 @@ class CashRegisterResource extends Resource
                                 ->success()
                                 ->title('Movimiento de Caja')
                                 ->body(
-                                    'Se ha registrado un movimiento de ' .
-                                        ($data['type'] === 'Entrada' ? 'Entrada' : 'Salida') .
-                                        ' por $' . number_format((float)$data['amount'], 2)
+                                    'Se ha registrado un movimiento de '.
+                                        ($data['type'] === 'Entrada' ? 'Entrada' : 'Salida').
+                                        ' por $'.number_format((float) $data['amount'], 2)
                                 )
                                 ->send();
                         }),
@@ -179,7 +176,7 @@ class CashRegisterResource extends Resource
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\ForceDeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

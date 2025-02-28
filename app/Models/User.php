@@ -16,9 +16,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable, softDeletes;
 
     use HasRoles;
-    //Admin
-    //register - register parchuse
-    //sales - sales, sales_detail, sales_payment
+    // Admin
+    // register - register parchuse
+    // sales - sales, sales_detail, sales_payment
 
     /**
      * The attributes that are mass assignable.

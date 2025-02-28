@@ -14,7 +14,7 @@ class ListCategories extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-            ->icon('heroicon-o-squares-plus'),
+                ->icon('heroicon-o-squares-plus'),
         ];
     }
 }

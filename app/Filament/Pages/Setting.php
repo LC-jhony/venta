@@ -3,21 +3,27 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting as ModelsSetting;
-use Filament\Forms\Form;
 use Filament\Forms;
-use Filament\Pages\Page;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Pages\Page;
 
 class Setting extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-cog';
 
     protected static string $view = 'filament.pages.setting';
+
     protected static ?string $navigationGroup = 'Systemm';
+
     protected static ?int $navigationSort = 2;
+
     protected static bool $shouldRegisterNavigation = true;
+
     public ?array $data = [];
+
     public ?ModelsSetting $settings = null;
+
     public function mount(): void
     {
         $this->settings = ModelsSetting::first();
@@ -33,7 +39,7 @@ class Setting extends Page
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\FileUpload::make('logo')
-                            ->default(fn() => ModelsSetting::first()?->logo ?? null)
+                            ->default(fn () => ModelsSetting::first()?->logo ?? null)
                             ->image()
                             ->disk('public')
                             ->directory('settings')
@@ -66,7 +72,6 @@ class Setting extends Page
                             ->maxLength(255),
                         Forms\Components\TextInput::make('web')
 
-
                             ->maxLength(255),
                         Forms\Components\TextInput::make('district')
                             ->label('Distrito')
@@ -79,7 +84,7 @@ class Setting extends Page
 
                             ->maxLength(255),
                     ])
-                    ->columns(2)
+                    ->columns(2),
             ])
             ->statePath('data');
     }

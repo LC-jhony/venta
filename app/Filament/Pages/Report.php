@@ -2,11 +2,11 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Forms;
-use App\Models\Sale;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Sale;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Forms;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 
@@ -15,11 +15,21 @@ class Report extends Page
     protected static ?string $navigationIcon = 'lineawesome-file-pdf';
 
     protected static string $view = 'filament.pages.report';
+
     protected static ?string $navigationGroup = 'Systemm';
+
     protected static ?string $title = 'Reports';
+
     protected static ?int $navigationSort = 1;
 
-    public $startDate, $endDate, $reportType, $productFilter;
+    public $startDate;
+
+    public $endDate;
+
+    public $reportType;
+
+    public $productFilter;
+
     public $showReport = false;
 
     public function mount(): void
@@ -28,6 +38,7 @@ class Report extends Page
         $this->endDate = now()->endOfMonth()->format('Y-m-d');
         $this->reportType = 'sales';
     }
+
     protected function getFormSchema(): array
     {
         return [
@@ -63,15 +74,15 @@ class Report extends Page
                             'expired' => 'Expired Products',
                             'low_stock' => 'Low Stock Products',
                             'out_of_stock' => 'Out of Stock Products',
-                            'near_expiry' => 'Products Near Expiry'
+                            'near_expiry' => 'Products Near Expiry',
                         ])
-                        ->visible(fn($get) => $get('reportType') === 'products')
+                        ->visible(fn ($get) => $get('reportType') === 'products')
                         ->default('all')
                         ->required()
                         ->live()
                         ->native(false),
                 ])
-                ->columns(3)
+                ->columns(3),
         ];
     }
 
@@ -92,10 +103,12 @@ class Report extends Page
                 $data = $this->getInventoryReport();
                 break;
         }
+
         return $data instanceof \Illuminate\Database\Eloquent\Collection
             ? $data->all()
             : $data->toArray();
     }
+
     public function generatePDF()
     {
 
@@ -107,11 +120,13 @@ class Report extends Page
             'reportType' => $this->reportType,
             'productFilter' => $this->productFilter ?? 'all',
         ]);
+
         return response()->streamDownload(
-            fn() => print($pdf->output()),
-            "report-{$this->reportType}-" . ($this->productFilter ? "{$this->productFilter}-" : "") . now()->format('Y-m-d') . '.pdf'
+            fn () => print ($pdf->output()),
+            "report-{$this->reportType}-".($this->productFilter ? "{$this->productFilter}-" : '').now()->format('Y-m-d').'.pdf'
         );
     }
+
     private function getSalesReport()
     {
         return Sale::whereBetween('created_at', [$this->startDate, $this->endDate])
@@ -123,6 +138,7 @@ class Report extends Page
             ->groupBy('date')
             ->get();
     }
+
     private function getPurchasesReport()
     {
         return Purchase::whereBetween('created_at', [$this->startDate, $this->endDate])

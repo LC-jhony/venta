@@ -19,12 +19,14 @@ class SuppliersResource extends Resource
     protected static ?string $navigationIcon = 'gmdi-engineering-tt';
 
     protected static ?string $navigationGroup = 'Sistem POS';
+
     protected static ?string $modelLabel = 'Proveedores';
 
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -98,54 +100,54 @@ class SuppliersResource extends Resource
                                 'md' => 3,
                                 'lg' => 3,
                                 'xl' => 3,
-                            ])
-                    ])
+                            ]),
+                    ]),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-        ->striped()
-        ->paginated([5, 10, 25, 50, 100, 'all'])
-        ->defaultPaginationPageOption(5)
+            ->striped()
+            ->paginated([5, 10, 25, 50, 100, 'all'])
+            ->defaultPaginationPageOption(5)
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                ->label('Nombre')
+                    ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                ->label('Correo')
+                    ->label('Correo')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
-                ->label('Telefono')
+                    ->label('Telefono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
-                ->label('Dirección')
+                    ->label('Dirección')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('status')
-                ->label('Estado')
+                    ->label('Estado')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('country')
-                ->label('Pais')
+                    ->label('Pais')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('city')
-                ->label('Ciudad')
+                    ->label('Ciudad')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('state')
-                ->label('Estado')
+                    ->label('Estado')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                ->label('Creado')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                ->label('Actualizado')
+                    ->label('Actualizado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
-                ->label('Eliminado')
+                    ->label('Eliminado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class QuoteSupplier extends Model
 {
-    //use SoftDeletes;
+    // use SoftDeletes;
 
     protected $fillable = [
         'quote_id',
@@ -18,16 +18,16 @@ class QuoteSupplier extends Model
     public function quote(): BelongsTo
     {
         return $this->belongsTo(
-            related:Quote::class,
-            foreignKey:'quote_id'
+            related: Quote::class,
+            foreignKey: 'quote_id'
         );
     }
 
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(
-            related:Supplier::class,
-            foreignKey:'supplier_id'
+            related: Supplier::class,
+            foreignKey: 'supplier_id'
         );
     }
 }

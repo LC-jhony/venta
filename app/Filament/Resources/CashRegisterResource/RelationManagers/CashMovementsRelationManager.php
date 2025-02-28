@@ -3,23 +3,23 @@
 namespace App\Filament\Resources\CashRegisterResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Enum\CashMovement\MovementType;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class CashMovementsRelationManager extends RelationManager
 {
     protected static string $relationship = 'cashMovements';
+
     protected function getTableQuery(): Builder
     {
         $query = parent::getTableQuery() ?? $this->getRelationship()->getQuery();
 
         return $query->where('type', 'Entrada');
     }
+
     public function form(Form $form): Form
     {
         return $form
@@ -36,7 +36,7 @@ class CashMovementsRelationManager extends RelationManager
             ->recordTitleAttribute('cash_register_id')
             ->columns([
                 Tables\Columns\TextColumn::make('type')
-                    ->formatStateUsing(fn() => 'Entrada'),
+                    ->formatStateUsing(fn () => 'Entrada'),
                 // ->color(fn(string $state): string => match ($state) {
                 //     'Entrada' => 'success',
                 //     'Salida' => 'danger',

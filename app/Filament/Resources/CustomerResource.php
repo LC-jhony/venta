@@ -28,6 +28,7 @@ class CustomerResource extends Resource
     {
         return static::getModel()::count();
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -69,8 +70,8 @@ class CustomerResource extends Resource
                                 'md' => 2,
                                 'lg' => 3,
                                 'xl' => 3,
-                            ])
-                    ])
+                            ]),
+                    ]),
             ]);
     }
 

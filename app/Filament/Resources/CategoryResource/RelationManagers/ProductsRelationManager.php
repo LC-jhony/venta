@@ -7,12 +7,11 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductsRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
+
     protected static ?string $title = 'Productos';
 
     public function form(Form $form): Form
@@ -58,10 +57,10 @@ class ProductsRelationManager extends RelationManager
                     ->searchable()
                     ->badge()
                     ->color(
-                        fn($record): string => $record->stock <= $record->stock_minimum ? 'danger' : ($record->stock <= $record->stock_minimum * 2 ? 'warning' : 'success')
+                        fn ($record): string => $record->stock <= $record->stock_minimum ? 'danger' : ($record->stock <= $record->stock_minimum * 2 ? 'warning' : 'success')
                     )
                     ->icon(
-                        fn($record) => $record->stock <= $record->stock_minimum ? 'heroicon-o-exclamation-triangle' : ($record->stock <= $record->stock_minimum * 2 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
+                        fn ($record) => $record->stock <= $record->stock_minimum ? 'heroicon-o-exclamation-triangle' : ($record->stock <= $record->stock_minimum * 2 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
                     ),
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Categoria')
@@ -82,10 +81,10 @@ class ProductsRelationManager extends RelationManager
                     ->badge()
                     ->date()
                     ->color(
-                        fn($record): string => now()->diffInDays($record->expiration, false) <= 0 ? 'danger' : (now()->diffInDays($record->expiration, false) <= 30 ? 'warning' : 'success')
+                        fn ($record): string => now()->diffInDays($record->expiration, false) <= 0 ? 'danger' : (now()->diffInDays($record->expiration, false) <= 30 ? 'warning' : 'success')
                     )
                     ->icon(
-                        fn($record) => now()->diffInDays($record->expiration, false) <= 0 ? 'heroicon-o-x-circle' : (now()->diffInDays($record->expiration, false) <= 30 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
+                        fn ($record) => now()->diffInDays($record->expiration, false) <= 0 ? 'heroicon-o-x-circle' : (now()->diffInDays($record->expiration, false) <= 30 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
                     ),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Creado')

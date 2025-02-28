@@ -4,14 +4,13 @@ namespace App\Mail;
 
 use App\Models\Quote;
 use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
 
 class QuoteShippedMail extends Mailable
 {
@@ -22,8 +21,7 @@ class QuoteShippedMail extends Mailable
      */
     public function __construct(
         public Quote $quote
-    )
-    {
+    ) {
         //
     }
 
@@ -33,7 +31,7 @@ class QuoteShippedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Cotización #' . $this->quote->number_quote,
+            subject: 'Cotización #'.$this->quote->number_quote,
         );
     }
 
@@ -63,12 +61,12 @@ class QuoteShippedMail extends Mailable
                     'user',
                     'suppliers'
                 ),
-                'setting' => $setting
+                'setting' => $setting,
             ]
         );
 
         return [
-            Attachment::fromData(fn () => $pdf->output(), 'cotizacion-' . $this->quote->number_quote . '.pdf')
+            Attachment::fromData(fn () => $pdf->output(), 'cotizacion-'.$this->quote->number_quote.'.pdf')
                 ->withMime('application/pdf'),
         ];
     }

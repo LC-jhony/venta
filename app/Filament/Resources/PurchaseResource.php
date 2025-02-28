@@ -29,10 +29,12 @@ class PurchaseResource extends Resource
     protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
 
     protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
     }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -118,7 +120,7 @@ class PurchaseResource extends Resource
                                     ->label(__('Purchase Number'))
                                     ->required()
                                     ->dehydrated()
-                                    ->default('ORDCMP-' . now()->format('Ymd') . '-' . rand(1000, 99999999))
+                                    ->default('ORDCMP-'.now()->format('Ymd').'-'.rand(1000, 99999999))
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
                                     ->options([

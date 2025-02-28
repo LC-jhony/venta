@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Quote;
+use App\Filament\Resources\QuoteResource\Pages;
 use App\Models\Product;
+use App\Models\Quote;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Awcodes\TableRepeater\Header;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\QuoteResource\Pages;
-use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,6 +25,7 @@ class QuoteResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
 
     protected static ?string $navigationGroup = 'Sistem POS';
+
     protected static ?string $modelLabel = 'Cotizacióne';
 
     public static function getNavigationBadge(): ?string
@@ -45,7 +46,7 @@ class QuoteResource extends Resource
                                     ->relationship(
                                         name: 'user',
                                         titleAttribute: 'name',
-                                        modifyQueryUsing: fn(Builder $query) => $query->latest()
+                                        modifyQueryUsing: fn (Builder $query) => $query->latest()
                                     )
                                     ->default(Auth::user()->id)
                                     ->disabled()
@@ -56,14 +57,14 @@ class QuoteResource extends Resource
                                     ->required()
                                     ->default(function () {
                                         $serialNumber = Quote::orderBy('number_quote', 'desc')->first();
-                                        $prefix = 'Cot_PE ' . date('y') . '-';
+                                        $prefix = 'Cot_PE '.date('y').'-';
                                         if ($serialNumber && str_starts_with($serialNumber->number_quote, $prefix)) {
                                             $number = intval(substr($serialNumber->number_quote, -5)) + 1;
                                         } else {
                                             $number = 1;
                                         }
 
-                                        return $prefix . str_pad($number, 5, '0', STR_PAD_LEFT);
+                                        return $prefix.str_pad($number, 5, '0', STR_PAD_LEFT);
                                     })
                                     ->disabled()
                                     ->dehydrated(true),
@@ -108,12 +109,12 @@ class QuoteResource extends Resource
                                                     ->required()
                                                     ->disableOptionWhen(function ($value, $state, Get $get) {
                                                         return collect($get('../*.product_id'))
-                                                            ->reject(fn($id) => $id == $state)
+                                                            ->reject(fn ($id) => $id == $state)
                                                             ->filter()
                                                             ->contains($value);
                                                     })
                                                     ->getOptionLabelFromRecordUsing(
-                                                        fn($record) => "{$record->name} - S/. {$record->purchase_price}"
+                                                        fn ($record) => "{$record->name} - S/. {$record->purchase_price}"
                                                     )
                                                     ->searchable(['name'])
                                                     ->preload()
@@ -206,6 +207,7 @@ class QuoteResource extends Resource
         }
         $set('total', number_format($total, 2, '.', ''));
     }
+
     private static function calculateLineTotal($quantity, $productId, callable $set)
     {
         $product = Product::find($productId);
@@ -223,9 +225,9 @@ class QuoteResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->striped()
-        ->paginated([5, 10, 25, 50, 100, 'all'])
-        ->defaultPaginationPageOption(5)
+            ->striped()
+            ->paginated([5, 10, 25, 50, 100, 'all'])
+            ->defaultPaginationPageOption(5)
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Usuario')
@@ -286,10 +288,10 @@ class QuoteResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                        ->when(
-                            $data['valid_date'],
-                            fn(Builder $query, $date): Builder => $query->whereDate('valid_date', $date)
-                        );
+                            ->when(
+                                $data['valid_date'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('valid_date', $date)
+                            );
                     }),
             ])
             ->actions([
@@ -302,8 +304,8 @@ class QuoteResource extends Resource
                 Tables\Actions\Action::make('pdf')
                     ->label('Pdf')
                     ->icon('lineawesome-file-pdf')
-                    ->url(fn($record): string => route('QUOTE-INVOICE', $record->id))
-                    ->openUrlInNewTab()
+                    ->url(fn ($record): string => route('QUOTE-INVOICE', $record->id))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -329,7 +331,7 @@ class QuoteResource extends Resource
             'create' => Pages\CreateQuote::route('/create'),
             'view' => Pages\ViewQuote::route('/{record}'),
             'edit' => Pages\EditQuote::route('/{record}/edit'),
-            //'invoice' => Pages\Invoice::route('/{record}/invoice'),
+            // 'invoice' => Pages\Invoice::route('/{record}/invoice'),
         ];
     }
 

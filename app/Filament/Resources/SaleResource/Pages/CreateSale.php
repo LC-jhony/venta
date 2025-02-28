@@ -60,6 +60,7 @@ class CreateSale extends CreateRecord
             'amount' => $this->record->total,
         ]);
     }
+
     private function updateProductStock(): void
     {
         $sale = $this->record;
@@ -71,6 +72,7 @@ class CreateSale extends CreateRecord
             }
         }
     }
+
     private function notifyCashRegisterRequired(): void
     {
 

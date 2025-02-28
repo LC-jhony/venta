@@ -19,7 +19,7 @@ class QuoteInvoice extends Controller
                     'user',
                     'supplier'
                 ),
-                'setting' => $setting
+                'setting' => $setting,
             ]
         );
 

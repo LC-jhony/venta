@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\QuoteSupplier;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quote extends Model
 {
@@ -29,6 +27,7 @@ class Quote extends Model
             foreignKey: 'user_id'
         );
     }
+
     // public function supplier()
     // {
     //     return $this->belongsTo(Supplier::class);

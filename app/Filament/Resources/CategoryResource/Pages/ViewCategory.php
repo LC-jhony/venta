@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\CategoryResource\Pages;
 
+use App\Filament\Resources\CategoryResource;
 use Filament\Actions;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Infolists\Components\Section;
-use App\Filament\Resources\CategoryResource;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\TextEntry;
 
 class ViewCategory extends ViewRecord
 {
@@ -20,6 +20,7 @@ class ViewCategory extends ViewRecord
             Actions\EditAction::make(),
         ];
     }
+
     public function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -41,7 +42,7 @@ class ViewCategory extends ViewRecord
                             ->boolean(),
                         TextEntry::make('description')
                             ->label('Descripción'),
-                    ])
+                    ]),
             ]);
     }
 }
