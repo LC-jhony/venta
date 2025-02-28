@@ -2,21 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PurchaseResource\Pages;
-use App\Models\Product;
-use App\Models\Purchase;
-use Awcodes\TableRepeater\Components\TableRepeater;
-use Awcodes\TableRepeater\Header;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Tables;
+use App\Models\Quote;
+use App\Models\Product;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Resources\Resource;
-use Filament\Tables;
+use App\Models\Purchase;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\Resource;
+use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PurchaseResource\Pages;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PurchaseResource extends Resource
 {
@@ -26,7 +27,7 @@ class PurchaseResource extends Resource
 
     protected static ?string $navigationGroup = 'Parchuse / Sale';
 
-    protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
+    //protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
 
     protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
 
@@ -42,18 +43,53 @@ class PurchaseResource extends Resource
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\Select::make('user_id')
+                            ->label('Usuario')
                             ->relationship('user', 'name')
                             ->default(Auth::id() ?? 1)
                             ->disabled()
                             ->dehydrated()
                             ->required(),
                         Forms\Components\Select::make('supplier_id')
+                            ->label('Proveedor')
                             ->relationship('supplier', 'name')
                             ->required()
                             ->searchable()
                             ->preload()
                             ->native(false),
+                        Forms\Components\Select::make('quote_id')
+                            ->label('Cotización')
+                            ->options(function () {
+                                return Quote::where('status', true)
+                                    ->pluck('number_quote', 'id');
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                if (!$state) return;
+
+                                $quote = Quote::with('quoteProducts.product')->find($state);
+                                if (!$quote) return;
+
+                                // Actualizar proveedor
+                                if ($quote->suppliers->first()) {
+                                    $set('supplier_id', $quote->suppliers->first()->id);
+                                }
+
+                                // Preparar detalles de compra desde la cotización
+                                $details = $quote->quoteProducts->map(function ($quoteProduct) {
+                                    return [
+                                        'product_id' => $quoteProduct->product_id,
+                                        'quantity' => $quoteProduct->quantity,
+                                        'unit_cost' => $quoteProduct->price_unit,
+                                    ];
+                                })->toArray();
+
+                                $set('detailparchuse', $details);
+                                self::calculatePurchaseTotal($details, $set);
+                            }),
                         Forms\Components\TextInput::make('total')
+                            ->label('Total')
                             ->disabled()
                             ->required()
                             ->dehydrated(true),
@@ -76,12 +112,12 @@ class PurchaseResource extends Resource
                                     })
                                     ->headers([
                                         Header::make('description'),
-                                        Header::make('quantity')->width('120px'),
-                                        Header::make('Price Unit')->width('120px'),
+                                        Header::make('Cantidad')->width('120px'),
+                                        Header::make('Pre. Unitario')->width('120px'),
                                     ])
                                     ->schema([
                                         Forms\Components\Select::make('product_id')
-                                            ->label(__('Product'))
+
                                             ->relationship('product', 'name')
                                             ->preload()
                                             ->searchable()
@@ -95,7 +131,7 @@ class PurchaseResource extends Resource
                                             })
                                             ->required(),
                                         Forms\Components\TextInput::make('quantity')
-                                            ->label(__('Quantity'))
+
                                             ->numeric()
                                             ->default(1)
                                             ->live()
@@ -103,13 +139,14 @@ class PurchaseResource extends Resource
                                             ->required(),
 
                                         Forms\Components\TextInput::make('unit_cost')
-                                            ->label(__('Parchuse Price'))
+
                                             ->live()
                                             ->dehydrated()
                                             ->readOnly()
                                             ->required(),
 
                                     ])
+                                    ->emptyLabel('Seleccione un producto')
                                     ->defaultItems(0)
                                     ->reorderable()
                                     ->columnSpan('full'),
@@ -117,12 +154,13 @@ class PurchaseResource extends Resource
                         Forms\Components\Card::make()
                             ->schema([
                                 Forms\Components\TextInput::make('purchase_number')
-                                    ->label(__('Purchase Number'))
+                                    ->label('N° Compra')
                                     ->required()
                                     ->dehydrated()
-                                    ->default('ORDCMP-'.now()->format('Ymd').'-'.rand(1000, 99999999))
+                                    ->default('ORDCMP-' . now()->format('Ymd') . '-' . rand(1000, 99999999))
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
+                                    ->label('estado')
                                     ->options([
                                         '1' => 'Aceptado',
                                         '0' => 'Rechazado',

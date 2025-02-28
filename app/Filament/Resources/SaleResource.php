@@ -31,7 +31,7 @@ class SaleResource extends Resource
 
     protected static ?string $navigationGroup = 'Parchuse / Sale';
 
-    protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
+    // protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
 
     //protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; 
     protected static ?string $modelLabel = "Venta";
