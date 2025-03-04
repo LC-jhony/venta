@@ -28,10 +28,6 @@ class Quote extends Model
         );
     }
 
-    // public function supplier()
-    // {
-    //     return $this->belongsTo(Supplier::class);
-    // }
     public function suppliers()
     {
         return $this->belongsToMany(
@@ -53,6 +49,13 @@ class Quote extends Model
     {
         return $this->hasMany(
             related: QuoteSupplier::class,
+        );
+    }
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(
+            related: Purchase::class,
+            foreignKey: 'quote_id'
         );
     }
 }

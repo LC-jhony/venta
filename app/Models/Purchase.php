@@ -14,6 +14,7 @@ class Purchase extends Model
     protected $fillable = [
         'user_id',
         'supplier_id',
+        'quote_id',
         'purchase_number',
         'status',
         'total',
@@ -32,6 +33,13 @@ class Purchase extends Model
         return $this->belongsTo(
             related: Supplier::class,
             foreignKey: 'supplier_id'
+        );
+    }
+    public function quote(): BelongsTo
+    {
+        return $this->belongsTo(
+            related: Quote::class,
+            foreignKey: 'quote_id'
         );
     }
 
