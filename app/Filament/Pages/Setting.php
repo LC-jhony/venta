@@ -14,7 +14,8 @@ class Setting extends Page
 
     protected static string $view = 'filament.pages.setting';
 
-    protected static ?string $navigationGroup = 'Systemm';
+    protected static ?string $navigationGroup = 'Sistema';
+    protected static ?string $title = 'Configuración';
 
     protected static ?int $navigationSort = 2;
 
