@@ -34,12 +34,47 @@ class PurchaseDetail extends Model
         );
     }
 
-    protected static function booted(): void
+    // protected static function booted(): void
+    // {
+    //     static::creating(function ($detailparchuse) {
+    //         $product = $detailparchuse->product;
+    //         $product->stock += $detailparchuse->quantity;
+    //         $product->save();
+    //     });
+    // }
+    protected static function boot(): void
     {
+        parent::boot();
+
         static::creating(function ($detailparchuse) {
+            if ($detailparchuse->purchase->status == '1') {
+                $product = $detailparchuse->product;
+                $product->stock += $detailparchuse->quantity;
+                $product->save();
+            }
+        });
+
+        static::updating(function ($detailparchuse) {
             $product = $detailparchuse->product;
-            $product->stock += $detailparchuse->quantity;
+
+            // Si el status cambió de true a false, revertir el stock
+            if ($detailparchuse->purchase->status == '0' && $detailparchuse->getOriginal('quantity')) {
+                $product->stock -= $detailparchuse->getOriginal('quantity');
+            }
+            // Si el status cambió de false a true, sumar al stock
+            elseif ($detailparchuse->purchase->status == '1') {
+                $product->stock += $detailparchuse->quantity;
+            }
+
             $product->save();
+        });
+
+        static::deleting(function ($detailparchuse) {
+            if ($detailparchuse->purchase->status == '1') {
+                $product = $detailparchuse->product;
+                $product->stock -= $detailparchuse->quantity;
+                $product->save();
+            }
         });
     }
 }

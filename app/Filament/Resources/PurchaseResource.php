@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Awcodes\TableRepeater\Header;
 use Illuminate\Support\Facades\Auth;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PurchaseResource\Pages;
 use Awcodes\TableRepeater\Components\TableRepeater;
@@ -26,7 +27,7 @@ class PurchaseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $navigationGroup = 'Parchuse / Sale';
-
+    protected static ?string $modelLabel = 'Compras';
     //protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
 
     protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
@@ -51,11 +52,27 @@ class PurchaseResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('supplier_id')
                             ->label('Proveedor')
-                            ->relationship('supplier', 'name')
+                            // ->relationship('supplier', 'name')
+
+                            ->options(function (Get $get) {
+                                $quoteId = $get('quote_id');
+                                if (!$quoteId) {
+                                    return [];
+                                }
+
+                                $quote = Quote::with('suppliers')->find($quoteId);
+                                if (!$quote) {
+                                    return [];
+                                }
+
+                                return $quote->suppliers->pluck('name', 'id');
+                            })
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->native(false),
+                            ->native(false)
+                            ->live()
+                            ->disabled(fn(Get $get) => !$get('quote_id')),
                         Forms\Components\Select::make('quote_id')
                             ->label('Cotización')
                             ->options(function () {
@@ -71,10 +88,10 @@ class PurchaseResource extends Resource
                                 $quote = Quote::with('quoteProducts.product')->find($state);
                                 if (!$quote) return;
 
-                                // Actualizar proveedor
-                                if ($quote->suppliers->first()) {
-                                    $set('supplier_id', $quote->suppliers->first()->id);
-                                }
+                                // Eliminar esta sección que auto-selecciona el proveedor
+                                // if ($quote->suppliers->first()) {
+                                //     $set('supplier_id', $quote->suppliers->first()->id);
+                                // }
 
                                 // Preparar detalles de compra desde la cotización
                                 $details = $quote->quoteProducts->map(function ($quoteProduct) {
@@ -88,11 +105,7 @@ class PurchaseResource extends Resource
                                 $set('detailparchuse', $details);
                                 self::calculatePurchaseTotal($details, $set);
                             }),
-                        Forms\Components\TextInput::make('total')
-                            ->label('Total')
-                            ->disabled()
-                            ->required()
-                            ->dehydrated(true),
+
 
                     ])->columns(3),
                 Forms\Components\Group::make()
@@ -153,6 +166,12 @@ class PurchaseResource extends Resource
                             ])->columnSpan(9),
                         Forms\Components\Card::make()
                             ->schema([
+                                Forms\Components\TextInput::make('total')
+                                    ->label('Total')
+                                    ->prefix('S/.')
+                                    ->disabled()
+                                    ->required()
+                                    ->dehydrated(true),
                                 Forms\Components\TextInput::make('purchase_number')
                                     ->label('N° Compra')
                                     ->required()
@@ -178,9 +197,11 @@ class PurchaseResource extends Resource
     {
         $total = 0;
         foreach ($detailparchuse as $detail) {
-            $total += $detail['unit_cost'];
+
+            // $total += $detail['unit_cost'];
+            $total += $detail['quantity'] * $detail['unit_cost'];
         }
-        $set('total', $total);
+        $set('total',  number_format($total, 2, '.', ''));
     }
 
     public static function table(Table $table): Table
@@ -188,35 +209,71 @@ class PurchaseResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label('Usuario')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('supplier.name')
+                    ->label('Proveedor')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('total_amount')
+                Tables\Columns\TextColumn::make('purchase_number')
+                    ->label('Numero')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\TextColumn::make('total')
+                    ->label('Total')
+                    ->money('S/.'),
+                Tables\Columns\IconColumn::make('status')
+                    ->label('Estado')
+                    ->boolean()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Actualizado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label('Eliminado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                SelectFilter::make('status')
+                    ->label('Estado')
+                    ->options([
+                        '1' => 'Aceptado',
+                        '0' => 'Rechazado',
+                    ])
+                    ->native(false),
+                SelectFilter::make('user_id')
+                    ->label('Usuario')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->native(false),
+                SelectFilter::make('supplier_id')
+                    ->label('Proveedor')
+                    ->relationship('supplier', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->native(false)
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+            Tables\Actions\DeleteAction::make(),
+            Tables\Actions\ForceDeleteAction::make(),
+            Tables\Actions\RestoreAction::make(),
+
+         
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
