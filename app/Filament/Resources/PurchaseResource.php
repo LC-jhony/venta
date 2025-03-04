@@ -207,6 +207,9 @@ class PurchaseResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->striped()
+            ->paginated([5, 10, 25, 50, 100, 'all'])
+            ->defaultPaginationPageOption(5)
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Usuario')
@@ -267,12 +270,13 @@ class PurchaseResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-            Tables\Actions\DeleteAction::make(),
-            Tables\Actions\ForceDeleteAction::make(),
-            Tables\Actions\RestoreAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn($record) => $record->status !== 1),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
 
-         
+
 
             ])
             ->bulkActions([

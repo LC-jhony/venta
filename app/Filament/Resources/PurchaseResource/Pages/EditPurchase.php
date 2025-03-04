@@ -12,7 +12,8 @@ use Illuminate\Support\Collection;
 class EditPurchase extends EditRecord
 {
     protected static string $resource = PurchaseResource::class;
-    
+
+
     protected ?Collection $originalDetails = null;
 
     protected function beforeFill(): void
@@ -34,7 +35,7 @@ class EditPurchase extends EditRecord
     {
         $purchase = $this->record;
         $originalStatus = $this->originalDetails?->first()['status'] ?? null;
-        
+
         // Si el estado es rechazado
         if ($purchase->status === '0') {
             foreach ($purchase->detailparchuse as $detail) {
@@ -48,8 +49,8 @@ class EditPurchase extends EditRecord
                     Notification::make()
                         ->title("Stock Actualizado: {$product->name}")
                         ->body("Se restaron {$detail->quantity} unidades del stock.\n" .
-                              "Stock anterior: {$oldStock}\n" .
-                              "Nuevo stock: {$product->stock}")
+                            "Stock anterior: {$oldStock}\n" .
+                            "Nuevo stock: {$product->stock}")
                         ->success()
                         ->send();
                 }
@@ -58,11 +59,11 @@ class EditPurchase extends EditRecord
             // Notificación resumen para estado rechazado
             $totalProducts = $purchase->detailparchuse->count();
             $totalQuantity = $purchase->detailparchuse->sum('quantity');
-            
+
             Notification::make()
                 ->title('Compra Rechazada')
                 ->body("Se han actualizado {$totalProducts} productos.\n" .
-                      "Total de unidades restadas: {$totalQuantity}")
+                    "Total de unidades restadas: {$totalQuantity}")
                 ->warning()
                 ->persistent()
                 ->send();
@@ -73,22 +74,22 @@ class EditPurchase extends EditRecord
                 $product = Product::find($detail->product_id);
                 if ($product) {
                     $oldStock = $product->stock;
-                    
+
                     // Si el estado anterior era rechazado, necesitamos ajustar el stock
                     if ($originalStatus === '0') {
                         $product->stock += ($detail->quantity * 2); // Compensamos la resta anterior y sumamos
                     } else {
                         $product->stock += $detail->quantity;
                     }
-                    
+
                     $product->save();
 
                     // Notificación detallada para cada producto
                     Notification::make()
                         ->title("Stock Actualizado: {$product->name}")
                         ->body("Se agregaron {$detail->quantity} unidades al stock.\n" .
-                              "Stock anterior: {$oldStock}\n" .
-                              "Nuevo stock: {$product->stock}")
+                            "Stock anterior: {$oldStock}\n" .
+                            "Nuevo stock: {$product->stock}")
                         ->success()
                         ->send();
                 }
@@ -97,11 +98,11 @@ class EditPurchase extends EditRecord
             // Notificación resumen para estado aceptado
             $totalProducts = $purchase->detailparchuse->count();
             $totalQuantity = $purchase->detailparchuse->sum('quantity');
-            
+
             Notification::make()
                 ->title('Compra Aceptada')
                 ->body("Se han actualizado {$totalProducts} productos.\n" .
-                      "Total de unidades agregadas: {$totalQuantity}")
+                    "Total de unidades agregadas: {$totalQuantity}")
                 ->success()
                 ->persistent()
                 ->send();

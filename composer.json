@@ -20,7 +20,6 @@
         "eightynine/filament-excel-import": "^3.1",
         "filament/filament": "^3.2",
         "icetalker/filament-table-repeatable-entry": "^1.0",
-        "jeffgreco13/filament-breezy": "^2.5",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "milon/barcode": "^11.0",

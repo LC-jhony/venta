@@ -18,13 +18,13 @@ return new class extends Migration
             $table->string('company_name');
             $table->string('type_company');
             $table->string('ruc');
-            $table->text('description')->nullable();
             $table->string('address');
             $table->string('phone');
             $table->string('email');
             $table->string('web')->nullable();
-            $table->string('district');
-            $table->string('department');
+            $table->string('district')->nullable();
+            $table->string('department')->nullable();
+            $table->string('province')->nullable();
             $table->timestamps();
         });
     }

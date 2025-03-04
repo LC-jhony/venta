@@ -12,12 +12,12 @@ class Setting extends Model
         'company_name',
         'type_company',
         'ruc',
-        'description',
         'address',
         'phone',
         'email',
         'web',
         'district',
         'department',
+        'province',
     ];
 }

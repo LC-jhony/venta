@@ -36,55 +36,107 @@ class Setting extends Page
     {
         return $form
             ->schema([
-                Forms\Components\Section::make()
+                Forms\Components\Section::make('Configuración General')
+                    ->description('Configuración general para la generación de PDF')
+                    ->icon('heroicon-o-cog')
+                    ->collapsible()
                     ->schema([
-                        Forms\Components\FileUpload::make('logo')
-                            ->default(fn () => ModelsSetting::first()?->logo ?? null)
-                            ->image()
-                            ->disk('public')
-                            ->directory('settings')
-                            ->required(),
-                        Forms\Components\TextInput::make('commercial_name')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('company_name')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('ruc')
-                            ->required(),
-                        Forms\Components\TextInput::make('type_company')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('description')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('address')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('phone')
+                        Forms\Components\Grid::make()
+                            ->columns(4)
+                            ->schema([
+                                Forms\Components\Card::make()
+                                    ->columnSpan(1)
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('logo')
+                                            ->label('Logo de la Empresa')
+                                            ->image()
+                                            ->default(fn() => ModelsSetting::first()?->logo ?? null)
+                                            ->disk('public')
+                                            ->directory('logo')
+                                  
+                                            ->helperText('Formato: JPG, PNG. Máximo 2MB'),
+                                    ]),
 
-                            ->tel()
-                            ->required()
-                            ->regex('/^\+?[0-9]{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/'),
-                        Forms\Components\TextInput::make('email')
-                            ->required()
-                            ->email()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('web')
+                                Forms\Components\Card::make()
+                                    ->columnSpan(3)
+                                    ->schema([
+                                        Forms\Components\Grid::make()
+                                            ->schema([
+                                                Forms\Components\TextInput::make('commercial_name')
+                                                    ->label('Nombre Comercial')                                    
+                                                    ->required()
+                                                    ->columnSpan(2),
 
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('district')
-                            ->label('Distrito')
-                            ->required()
+                                                Forms\Components\TextInput::make('company_name')
+                                                    ->label('Nombre de la Compañia')                                 
+                                                    ->required()
+                                                    ->columnSpan(2),
 
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('department')
-                            ->label('Departamento')
-                            ->required()
+                                                Forms\Components\TextInput::make('type_company')
+                                                    ->label('Tipo de Compañia')                                          
+                                                    ->required()
+                                                    ->columnSpan(2),
+                                            ]),
 
-                            ->maxLength(255),
-                    ])
-                    ->columns(2),
+                                    ]),
+                                Forms\Components\Section::make('Datos de Contacto')
+                                    ->icon('heroicon-o-phone')
+                                    ->compact()
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        Forms\Components\Grid::make()
+                                            ->columns(3)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('ruc')
+                                                    ->label('RUC')
+                                                    ->placeholder('Ingrese la provincia')
+                                                    ->numeric()
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('address')
+                                                    ->label('Direccion')
+                                                    ->placeholder('Ingrese el departamento')
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('phone')
+                                                    ->label('Telefono')
+                                                    ->placeholder('Ingrese la dirección')
+                                                    ->required(),
+                                                Forms\Components\Grid::make()
+                                                    ->schema([
+                                                        Forms\Components\TextInput::make('email')
+                                                            ->label('Correo')
+                                                            ->placeholder('Ingrese la dirección')
+                                                            ->required(),
+                                                        Forms\Components\TextInput::make('web')
+                                                            ->label('Web')
+                                                            ->placeholder('Ingrese la dirección')
+                                                            ->required(),
+                                                    ])
+                                            ]),
+                                    ]),
+                                Forms\Components\Section::make('Ubicación')
+                                    ->icon('heroicon-o-map-pin')
+                                    ->compact()
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        Forms\Components\Grid::make()
+                                            ->columns(3)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('department')
+                                                    ->label('Departamento')
+                                                    ->placeholder('Ingrese el departamento')
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('province')
+                                                    ->label('Provincia')
+                                                    ->placeholder('Ingrese la dirección')
+                                                    ->required(),
+                                                Forms\Components\TextInput::make('district')
+                                                    ->label('Distrito')
+                                                    ->placeholder('Ingrese la provincia')
+                                                    ->required(),
+                                            ]),
+                                    ]),
+                            ]),
+                    ]),
             ])
             ->statePath('data');
     }
