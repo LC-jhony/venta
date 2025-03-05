@@ -7,9 +7,10 @@
             'center' => 'text-center',
         ][$align] ?? 'text-left';
 @endphp
-<th
-    {{ $attributes->merge([
-        'class' => "px-1 py-6 whitespace-nowrap bg-gray-300 $textAlignClass md:px-6 md:py-3 md:text-left font-medium text-sm border border-gray-300 dark:border-white/5 dark:bg-gray-900",
-    ]) }}>
-    {{ $slot }}
+<th {{ $attributes->merge([
+    'class' => "fi-ta-header-cell px-3 py-3.5 sm:first-of-type:ps-6 sm:last-of-type:pe-6 font-medium text-sm text-gray-900 dark:text-white $textAlignClass"
+]) }}>
+    <span class="flex items-center gap-x-1">
+        {{ $slot }}
+    </span>
 </th>

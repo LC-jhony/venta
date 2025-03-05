@@ -2,13 +2,17 @@
 
 namespace App\Filament\Pages;
 
+use Carbon\Carbon;
+use Filament\Forms;
+use App\Models\Sale;
+use App\Models\User;
 use App\Models\Product;
 use App\Models\Purchase;
-use App\Models\Sale;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Pages\Page;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+
 
 class Report extends Page
 {
@@ -16,20 +20,13 @@ class Report extends Page
 
     protected static string $view = 'filament.pages.report';
 
-    protected static ?string $navigationGroup = 'Systemm';
+    protected static ?string $navigationGroup = 'Sistema';
 
-    protected static ?string $title = 'Reports';
+    protected static ?string $title = 'Reporte';
 
     protected static ?int $navigationSort = 1;
 
-    public $startDate;
-
-    public $endDate;
-
-    public $reportType;
-
-    public $productFilter;
-
+    public $startDate, $endDate, $reportType, $productFilter;
     public $showReport = false;
 
     public function mount(): void
@@ -39,55 +36,111 @@ class Report extends Page
         $this->reportType = 'sales';
     }
 
-    protected function getFormSchema(): array
+    public function form(Form $form): Form
     {
-        return [
-            Forms\Components\Card::make()
-                ->schema([
-                    Forms\Components\DatePicker::make('startDate')
-                        ->label('Start Date')
-                        ->required()
-                        ->native(false),
-                    Forms\Components\DatePicker::make('endDate')
-                        ->label('End Date')
-                        ->required()
-                        ->native(false),
-                    Forms\Components\Select::make('reportType')
-                        ->label('Report Type')
-                        ->options([
-                            'sales' => 'sales',
-                            'purchases' => 'purchases',
-                            'products' => 'products',
-                            'inventory' => 'inventory',
-                        ])
-                        ->required()
-                        ->live()
-                        ->afterStateUpdated(function ($state) {
-                            $this->reportType = $state;
-                            $this->showReport = true;
-                        })
-                        ->native(false),
-                    Forms\Components\Select::make('productFilter')
-                        ->label('Product Filter')
-                        ->options([
-                            'all' => 'All Products',
-                            'expired' => 'Expired Products',
-                            'low_stock' => 'Low Stock Products',
-                            'out_of_stock' => 'Out of Stock Products',
-                            'near_expiry' => 'Products Near Expiry',
-                        ])
-                        ->visible(fn ($get) => $get('reportType') === 'products')
-                        ->default('all')
-                        ->required()
-                        ->live()
-                        ->native(false),
-                ])
-                ->columns(3),
-        ];
+        return $form
+            ->schema([
+                Forms\Components\Section::make('Reporte del Sistema')
+                    ->schema([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\Card::make('Selecione Datos')
+                                    ->icon('heroicon-o-funnel')
+                                    ->schema([
+                                        Forms\Components\DatePicker::make('startDate')
+                                            ->label('Fecha Desde')
+                                            ->prefixIcon('heroicon-o-calendar')
+                                            ->required()
+                                            ->native(false),
+                                        Forms\Components\DatePicker::make('endDate')
+                                            ->label('Fecha Hasta')
+                                            ->prefixIcon('heroicon-o-calendar')
+                                            ->required()
+                                            ->native(false),
+                                        Forms\Components\Select::make('reportType')
+                                            ->label('Tipo de Reporte')
+                                            ->options([
+                                                'sales' => 'Ventas',
+                                                'purchases' => 'Compras',
+                                                'products' => 'Productos',
+                                                'inventory' => 'Inventario',
+                                            ])
+                                            ->required()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state) {
+                                                $this->reportType = $state;
+                                                $this->showReport = true;
+                                            })
+                                            ->native(false),
+                                        Forms\Components\Select::make('productFilter')
+                                            ->label('Filtrar Productos')
+                                            ->options([
+                                                'all' => 'todo',
+                                                'expired' => 'Productos caducados',
+                                                'low_stock' => 'Productos con poco stock',
+                                                'out_of_stock' => 'Productos Fuera de Stock',
+                                                'near_expiry' => 'Productos próximos a caducar',
+                                            ])
+                                            ->visible(fn($get) => $get('reportType') === 'products')
+                                            ->default('all')
+                                            ->required()
+                                            ->live()
+                                            ->native(false),
+                                    ])
+                                    ->columnSpan([
+                                        'default' => 'full',
+                                        'md' => 4,
+                                    ]),
+                                Forms\Components\Card::make('Previsualización')
+                                    ->icon('heroicon-o-eye')
+                                    ->headerActions([
+                                        Forms\Components\Actions\Action::make('generate')
+                                            ->label('Imprimir')
+                                            ->icon('fluentui-print-48-o')
+                                            ->outlined()
+                                            ->action(function () {
+                                                $data = $this->getViewData();
+                                                $pdf = PDF::loadView('pdf.report', [
+                                                    'data' => $data,
+                                                    'startDate' => $this->startDate,
+                                                    'endDate' => $this->endDate,
+                                                    'reportType' => $this->reportType,
+                                                    'productFilter' => $this->productFilter ?? 'all',
+                                                    'setting' => \App\Models\Setting::first(),
+                                                ]);
+                                                return response()->streamDownload(
+                                                    fn() => print($pdf->output()),
+                                                    "reporte-{$this->reportType}-" .
+                                                        ($this->productFilter ? "{$this->productFilter}-" : '') .
+                                                        now()->format('Y-m-d') . '.pdf'
+                                                );
+                                            })
+
+                                    ])
+                                    ->schema([
+                                        Forms\Components\ViewField::make('report')
+                                            ->view('report.report', [
+                                                'setting' => \App\Models\Setting::first(),
+
+
+                                            ])
+                                    ])
+                                    ->columnSpan([
+                                        'default' => 'full',
+                                        'md' => 8,
+                                    ]),
+                            ])
+                            ->columns(12)
+                    ])
+            ]);
     }
 
     public function getViewData(): array
     {
+        if (!$this->reportType) {
+            return [];
+        }
+
         $data = [];
         switch ($this->reportType) {
             case 'sales':
@@ -104,56 +157,80 @@ class Report extends Page
                 break;
         }
 
-        return $data instanceof \Illuminate\Database\Eloquent\Collection
-            ? $data->all()
-            : $data->toArray();
-    }
+        if ($data instanceof \Illuminate\Database\Eloquent\Collection) {
+            return $data->all();
+        }
 
-    public function generatePDF()
-    {
+        if (is_array($data)) {
+            return $data;
+        }
 
-        $data = $this->getViewData();
-        $pdf = PDF::loadView('pdf.report', [
-            'data' => $data,
-            'startDate' => $this->startDate,
-            'endDate' => $this->endDate,
-            'reportType' => $this->reportType,
-            'productFilter' => $this->productFilter ?? 'all',
-        ]);
-
-        return response()->streamDownload(
-            fn () => print ($pdf->output()),
-            "report-{$this->reportType}-".($this->productFilter ? "{$this->productFilter}-" : '').now()->format('Y-m-d').'.pdf'
-        );
+        return [];
     }
 
     private function getSalesReport()
     {
-        return Sale::whereBetween('created_at', [$this->startDate, $this->endDate])
-            ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as total_sales'),
-                DB::raw('SUM(total) as total_amount')
-            )
-            ->groupBy('date')
+        return Sale::with(['customer', 'user'])
+            ->whereBetween('created_at', [$this->startDate, $this->endDate])
+            ->select([
+                'id',
+                'customer_id',
+                'user_id',
+                'invoice_number',
+                'subtotal',
+                'tax',
+                'total',
+                'created_at'
+            ])
+            ->orderBy('created_at', 'desc')
             ->get();
     }
-
     private function getPurchasesReport()
     {
-        return Purchase::whereBetween('created_at', [$this->startDate, $this->endDate])
-            ->select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as total_purchases'),
-                DB::raw('SUM(total) as total_amount')
-            )
-            ->groupBy('date')
-            ->get();
-    }
+        return Purchase::with(['user', 'supplier'])
+            ->whereBetween('created_at', [$this->startDate, $this->endDate])
+            ->select([
+                'id',
+                'user_id',
+                'supplier_id',
+                'purchase_number',
+                'total',
+                'created_at'
 
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        // return Purchase::whereBetween('created_at', [$this->startDate, $this->endDate])
+        //     ->select(
+        //         DB::raw('DATE(created_at) as date'),
+        //         DB::raw('COUNT(*) as total_purchases'),
+        //         DB::raw('SUM(total) as total_amount')
+        //     )
+        //     ->groupBy('date')
+        //     ->get();
+    }
     private function getProductsReport()
     {
-        $query = Product::query();
+        $query = Product::query()
+            ->with('category')
+            ->select([
+                'id',
+                'name',
+                'stock',
+                'sales_price',
+                'purchase_price',
+                'expiration',
+                'stock_minimum',
+                'category_id',
+                DB::raw('DATEDIFF(expiration, CURDATE()) as days_until_expiry'),
+                DB::raw('CASE 
+                WHEN expiration < CURDATE() THEN "expired"
+                WHEN DATEDIFF(expiration, CURDATE()) <= 30 THEN "near_expiry"
+                WHEN stock <= 0 THEN "out_of_stock"
+                WHEN stock <= stock_minimum THEN "low_stock"
+                ELSE "normal"
+            END as status')
+            ]);
 
         switch ($this->productFilter) {
             case 'expired':
@@ -170,19 +247,31 @@ class Report extends Page
                 break;
         }
 
-        return $query->select('name', 'stock', 'sales_price', 'purchase_price', 'expiration', 'stock_minimum')
-            ->orderBy('stock', 'desc')
-            ->get();
-        // return Product::select('name', 'stock', 'sales_price', 'purchase_price')
-        //     ->orderBy('stock', 'desc')
-        //     ->get();
-    }
-
-    private function getInventoryReport()
-    {
-        return Product::where('stock', '<=', DB::raw('stock_minimum'))
-            ->select('name', 'stock', 'stock_minimum')
+        return $query->orderBy('status', 'desc')
             ->orderBy('stock', 'asc')
             ->get();
+    }
+    private function getInventoryReport()
+    {
+        return Product::query()
+            ->with('category')  // Incluimos la relación con categoría
+            ->where('stock', '<=', DB::raw('stock_minimum * 1.5')) // Alertar cuando stock está al 150% del mínimo
+            ->select([
+                'id',
+                'name',
+                'stock',
+                'stock_minimum',
+                'category_id',
+         
+                DB::raw('CASE 
+                WHEN stock <= stock_minimum THEN "critico"  
+                WHEN stock <= (stock_minimum * 1.5) THEN "advertencia"
+                ELSE "normal"
+            END as stock_status')
+            ])
+            ->orderBy('stock_status', 'desc')
+            ->orderBy('stock', 'asc')
+            ->get();
+   
     }
 }
