@@ -2,17 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\QuoteProduct;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class QuoteProductSeeder extends Seeder
+class PurchaseDetailSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        QuoteProduct::factory(500)->create();
+        //
     }
 }

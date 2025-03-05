@@ -21,7 +21,7 @@ class ProductFactory extends Factory
         return [
             'bar_code' => $this->faker->ean13(),
             'image' => $this->faker->imageUrl(),
-            'name' => fake()->name(3, true),
+            'name' => fake()->name(5, true),
             'purchase_price' => $this->faker->randomFloat(2, 10, 1000),
             'sales_price' => $this->faker->randomFloat(2, 10, 1000),
             'stock' => $this->faker->numberBetween(0, 1000),
