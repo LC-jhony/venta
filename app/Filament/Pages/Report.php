@@ -121,7 +121,11 @@ class Report extends Page
                                         Forms\Components\ViewField::make('report')
                                             ->view('report.report', [
                                                 'setting' => \App\Models\Setting::first(),
-
+                                                'startDate' => $this->startDate,
+                                                'endDate' => $this->endDate,
+                                                'reportType' => $this->reportType,
+                                                'productFilter' => $this->productFilter ?? 'all',
+                                                'data' => $this->getViewData(),
 
                                             ])
                                     ])
@@ -224,10 +228,10 @@ class Report extends Page
                 'category_id',
                 DB::raw('DATEDIFF(expiration, CURDATE()) as days_until_expiry'),
                 DB::raw('CASE 
-                WHEN expiration < CURDATE() THEN "expired"
-                WHEN DATEDIFF(expiration, CURDATE()) <= 30 THEN "near_expiry"
-                WHEN stock <= 0 THEN "out_of_stock"
-                WHEN stock <= stock_minimum THEN "low_stock"
+                WHEN expiration < CURDATE() THEN "caducado"
+                WHEN DATEDIFF(expiration, CURDATE()) <= 30 THEN "por caducar"
+                WHEN stock <= 0 THEN "sin stock"
+                WHEN stock <= stock_minimum THEN "stock bajo"
                 ELSE "normal"
             END as status')
             ]);
@@ -262,7 +266,7 @@ class Report extends Page
                 'stock',
                 'stock_minimum',
                 'category_id',
-         
+
                 DB::raw('CASE 
                 WHEN stock <= stock_minimum THEN "critico"  
                 WHEN stock <= (stock_minimum * 1.5) THEN "advertencia"
@@ -272,6 +276,5 @@ class Report extends Page
             ->orderBy('stock_status', 'desc')
             ->orderBy('stock', 'asc')
             ->get();
-   
     }
 }

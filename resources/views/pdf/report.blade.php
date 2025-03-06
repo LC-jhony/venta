@@ -23,21 +23,21 @@
 
     <div>
         <table style="width: 100%; margin-top: -2.5rem; margin-bottom: 1.5rem;">
-            <tr>
-                <td style="width: 60%; text-align: left;">
-                    <h4
-                        style="font-size: 2.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">
-                        Reporte de
-                        {{ ucfirst(
-                            match ($reportType) {
-                                'sales' => 'Ventas',
-                                'purchases' => 'Compras',
-                                'products' => 'Productos',
-                                'inventory' => 'Inventario',
-                                default => $reportType,
-                            },
-                        ) }}
-                    </h4>
+                <tr>
+                    <td style="width: 60%; text-align: left;">
+                        <h4
+                            style="font-size: 2.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">
+                            Reporte de
+                            {{ ucfirst(
+                                match ($reportType) {
+                                    'sales' => 'Ventas',
+                                    'purchases' => 'Compras',
+                                    'products' => 'Productos',
+                                    'inventory' => 'Inventario',
+                                    default => $reportType,
+                                },
+                            ) }}
+                        </h4>
                 </td>
                 <td style="width: 40%; text-align: right; vertical-align: top;">
                     <div style="border: 1px solid #ccc; border-radius: 8px; padding: 10px; background-color: #f9f9f9;">
@@ -51,7 +51,7 @@
                         </p>
                     </div>
                 </td>
-            </tr>
+            </tr>                               
         </table>
     </div>
 
