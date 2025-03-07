@@ -2,17 +2,16 @@
 
 namespace App\Filament\Resources\PurchaseResource\Pages;
 
-use Filament\Actions;
+use App\Filament\Resources\PurchaseResource;
 use App\Models\Product;
+use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use App\Filament\Resources\PurchaseResource;
 use Illuminate\Support\Collection;
 
 class EditPurchase extends EditRecord
 {
     protected static string $resource = PurchaseResource::class;
-
 
     protected ?Collection $originalDetails = null;
 
@@ -25,7 +24,7 @@ class EditPurchase extends EditRecord
                     'product_id' => $detail->product_id,
                     'quantity' => $detail->quantity,
                     'product_name' => $detail->product->name,
-                    'status' => $this->record->status
+                    'status' => $this->record->status,
                 ];
             });
         }
@@ -48,8 +47,8 @@ class EditPurchase extends EditRecord
                     // Notificación detallada para cada producto
                     Notification::make()
                         ->title("Stock Actualizado: {$product->name}")
-                        ->body("Se restaron {$detail->quantity} unidades del stock.\n" .
-                            "Stock anterior: {$oldStock}\n" .
+                        ->body("Se restaron {$detail->quantity} unidades del stock.\n".
+                            "Stock anterior: {$oldStock}\n".
                             "Nuevo stock: {$product->stock}")
                         ->success()
                         ->send();
@@ -62,7 +61,7 @@ class EditPurchase extends EditRecord
 
             Notification::make()
                 ->title('Compra Rechazada')
-                ->body("Se han actualizado {$totalProducts} productos.\n" .
+                ->body("Se han actualizado {$totalProducts} productos.\n".
                     "Total de unidades restadas: {$totalQuantity}")
                 ->warning()
                 ->persistent()
@@ -87,8 +86,8 @@ class EditPurchase extends EditRecord
                     // Notificación detallada para cada producto
                     Notification::make()
                         ->title("Stock Actualizado: {$product->name}")
-                        ->body("Se agregaron {$detail->quantity} unidades al stock.\n" .
-                            "Stock anterior: {$oldStock}\n" .
+                        ->body("Se agregaron {$detail->quantity} unidades al stock.\n".
+                            "Stock anterior: {$oldStock}\n".
                             "Nuevo stock: {$product->stock}")
                         ->success()
                         ->send();
@@ -101,7 +100,7 @@ class EditPurchase extends EditRecord
 
             Notification::make()
                 ->title('Compra Aceptada')
-                ->body("Se han actualizado {$totalProducts} productos.\n" .
+                ->body("Se han actualizado {$totalProducts} productos.\n".
                     "Total de unidades agregadas: {$totalQuantity}")
                 ->success()
                 ->persistent()

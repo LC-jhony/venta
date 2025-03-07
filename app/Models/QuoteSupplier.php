@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class QuoteSupplier extends Model
 {
     // use SoftDeletes;
-use HasFactory;
+    use HasFactory;
+
     protected $fillable = [
         'quote_id',
         'supplier_id',

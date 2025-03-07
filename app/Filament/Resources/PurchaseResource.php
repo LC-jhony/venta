@@ -2,23 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Quote;
+use App\Filament\Resources\PurchaseResource\Pages;
 use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\Quote;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use App\Models\Purchase;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use Awcodes\TableRepeater\Header;
-use Illuminate\Support\Facades\Auth;
+use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\PurchaseResource\Pages;
-use Awcodes\TableRepeater\Components\TableRepeater;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseResource extends Resource
 {
@@ -27,8 +27,9 @@ class PurchaseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $navigationGroup = 'Parchuse / Sale';
+
     protected static ?string $modelLabel = 'Compras';
-    //protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
+    // protected static ?string $recordTitleAttribute = 'purchase_number'; // para que se pueda buscar de manera global
 
     protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; // cambiar el icono de la seccion activa
 
@@ -56,12 +57,12 @@ class PurchaseResource extends Resource
 
                             ->options(function (Get $get) {
                                 $quoteId = $get('quote_id');
-                                if (!$quoteId) {
+                                if (! $quoteId) {
                                     return [];
                                 }
 
                                 $quote = Quote::with('suppliers')->find($quoteId);
-                                if (!$quote) {
+                                if (! $quote) {
                                     return [];
                                 }
 
@@ -72,7 +73,7 @@ class PurchaseResource extends Resource
                             ->preload()
                             ->native(false)
                             ->live()
-                            ->disabled(fn(Get $get) => !$get('quote_id')),
+                            ->disabled(fn (Get $get) => ! $get('quote_id')),
                         Forms\Components\Select::make('quote_id')
                             ->label('Cotización')
                             ->options(function () {
@@ -83,10 +84,14 @@ class PurchaseResource extends Resource
                             ->preload()
                             ->live()
                             ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                                if (!$state) return;
+                                if (! $state) {
+                                    return;
+                                }
 
                                 $quote = Quote::with('quoteProducts.product')->find($state);
-                                if (!$quote) return;
+                                if (! $quote) {
+                                    return;
+                                }
 
                                 // Eliminar esta sección que auto-selecciona el proveedor
                                 // if ($quote->suppliers->first()) {
@@ -105,7 +110,6 @@ class PurchaseResource extends Resource
                                 $set('detailparchuse', $details);
                                 self::calculatePurchaseTotal($details, $set);
                             }),
-
 
                     ])->columns(3),
                 Forms\Components\Group::make()
@@ -176,7 +180,7 @@ class PurchaseResource extends Resource
                                     ->label('N° Compra')
                                     ->required()
                                     ->dehydrated()
-                                    ->default('ORDCMP-' . now()->format('Ymd') . '-' . rand(1000, 99999999))
+                                    ->default('ORDCMP-'.now()->format('Ymd').'-'.rand(1000, 99999999))
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
                                     ->label('estado')
@@ -201,7 +205,7 @@ class PurchaseResource extends Resource
             // $total += $detail['unit_cost'];
             $total += $detail['quantity'] * $detail['unit_cost'];
         }
-        $set('total',  number_format($total, 2, '.', ''));
+        $set('total', number_format($total, 2, '.', ''));
     }
 
     public static function table(Table $table): Table
@@ -266,17 +270,15 @@ class PurchaseResource extends Resource
                     ->relationship('supplier', 'name')
                     ->searchable()
                     ->preload()
-                    ->native(false)
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn($record) => $record->status !== 1),
+                    ->visible(fn ($record) => $record->status !== 1),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
-
-
 
             ])
             ->bulkActions([

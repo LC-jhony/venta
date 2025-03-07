@@ -2,26 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use App\Models\Sale;
-use Filament\Tables;
+use App\Filament\Resources\SaleResource\Pages;
 use App\Models\Product;
+use App\Models\Sale;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
+use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
-use Filament\Forms\Form;
-use App\Models\SaleDetail;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Awcodes\TableRepeater\Header;
-use Filament\Forms\Components\Actions\Action;
-use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
-use App\Filament\Resources\SaleResource\Pages;
-use Awcodes\TableRepeater\Components\TableRepeater;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Pelmered\FilamentMoneyField\Forms\Components\MoneyInput;
+use Illuminate\Support\Facades\Auth;
 
 class SaleResource extends Resource
 {
@@ -33,12 +31,14 @@ class SaleResource extends Resource
 
     // protected static ?string $recordTitleAttribute = 'sale_number'; // para que se pueda buscar de manera global
 
-    //protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge'; 
-    protected static ?string $modelLabel = "Venta";
+    // protected static ?string $activeNavigationIcon = 'heroicon-o-check-badge';
+    protected static ?string $modelLabel = 'Venta';
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
     }
+
     public static function form(Form $form): Form
     {
         $products = Product::get();
@@ -125,7 +125,7 @@ class SaleResource extends Resource
                                                     ->label('Dirección')
                                                     ->required()
                                                     ->maxLength(255),
-                                            ])
+                                            ]),
                                     ])
                                     ->createOptionAction(function (Action $action) {
                                         return $action
@@ -143,7 +143,7 @@ class SaleResource extends Resource
                                     ->dehydrated(),
                                 Forms\Components\TextInput::make('invoice_number')
                                     ->label('Número de Factura')
-                                    ->default('FAC-' . now()->format('Y') . '-' . rand(1000, 999999))
+                                    ->default('FAC-'.now()->format('Y').'-'.rand(1000, 999999))
                                     ->required()
                                     ->unique(Sale::class, 'invoice_number', ignoreRecord: true)
                                     ->disabled()
@@ -207,6 +207,7 @@ class SaleResource extends Resource
                                                             ->danger()
                                                             ->send();
                                                         $set('quantity', $product->stock);
+
                                                         return;
                                                     }
                                                 }
@@ -350,7 +351,7 @@ class SaleResource extends Resource
                 Tables\Actions\Action::make('invoice')
                     ->label('PDF')
                     ->icon('lineawesome-file-pdf')
-                    ->url(fn($record): string => route('PRINT.INVOICE-SALE', $record->id))
+                    ->url(fn ($record): string => route('PRINT.INVOICE-SALE', $record->id))
                     ->openUrlInNewTab(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),

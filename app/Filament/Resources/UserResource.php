@@ -56,7 +56,13 @@ class UserResource extends Resource
                             ->required(fn(string $operation): bool => $operation === 'create')
                             ->maxLength(255),
 
-                    ])->columns(2)
+                    ])->columns(2),
+                Forms\Components\Section::make('Roles')
+                    ->schema([
+                        // Forms\Components\CheckboxList::make('roles')
+                        //     ->relationship('roles', 'name')
+                        //     ->searchable(),
+                    ])
             ]);
     }
 
@@ -70,7 +76,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label('Correo')
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('email_verified_at')
+                // Tables\Columns\TextColumn::make('roles.name')
                 //     ->dateTime()
                 //     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')

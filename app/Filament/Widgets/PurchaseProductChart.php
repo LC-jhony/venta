@@ -9,8 +9,8 @@ use Illuminate\Support\Carbon;
 class PurchaseProductChart extends ChartWidget
 {
     protected static ?string $heading = 'Compras Chart';
-    protected static ?int $sort = 2;
 
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {

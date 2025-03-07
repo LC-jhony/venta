@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use App\Models\Quote;
 use App\Models\Supplier;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ class PurchaseFactory extends Factory
     {
         return [
             'user_id' => User::inRandomOrder()->first()->id,
-            'supplier_id' =>  Supplier::inRandomOrder()->first()->id,
+            'supplier_id' => Supplier::inRandomOrder()->first()->id,
             'quote_id' => Quote::inRandomOrder()->first()->id,
             'purchase_number' => $this->faker->ean13(),
             'status' => $this->faker->boolean(),

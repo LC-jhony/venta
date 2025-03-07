@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 class SaleProductChart extends ChartWidget
 {
     protected static ?string $heading = 'Ventas Chart';
+
     protected static ?int $sort = 3;
 
     protected function getData(): array

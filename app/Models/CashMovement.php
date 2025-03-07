@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CashMovement extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'cash_register_id',
         'type',

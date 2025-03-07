@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\PurchaseResource\Pages;
 
+use App\Filament\Resources\PurchaseResource;
 use Filament\Actions;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\PurchaseResource;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 
 class ViewPurchase extends ViewRecord
@@ -19,6 +19,7 @@ class ViewPurchase extends ViewRecord
             Actions\EditAction::make(),
         ];
     }
+
     public function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -30,7 +31,7 @@ class ViewPurchase extends ViewRecord
                         Infolists\Components\TextEntry::make('supplier.name')
                             ->label('Proveedor'),
                         Infolists\Components\TextEntry::make('quote.number_quote')
-                            ->label('Cotización')
+                            ->label('Cotización'),
                     ])->columns(3),
                 Infolists\Components\Group::make()
                     ->columnSpanFull()

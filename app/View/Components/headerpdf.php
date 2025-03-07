@@ -25,7 +25,7 @@ class headerpdf extends Component
     public function render(): View|Closure|string
     {
         return view('components.headerpdf', [
-            'setting' => $this->setting
+            'setting' => $this->setting,
         ]);
     }
 }

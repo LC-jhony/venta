@@ -15,6 +15,7 @@ class Setting extends Page
     protected static string $view = 'filament.pages.setting';
 
     protected static ?string $navigationGroup = 'Sistema';
+
     protected static ?string $title = 'Configuración';
 
     protected static ?int $navigationSort = 2;
@@ -51,10 +52,10 @@ class Setting extends Page
                                         Forms\Components\FileUpload::make('logo')
                                             ->label('Logo de la Empresa')
                                             ->image()
-                                            ->default(fn() => ModelsSetting::first()?->logo ?? null)
+                                            ->default(fn () => ModelsSetting::first()?->logo ?? null)
                                             ->disk('public')
                                             ->directory('logo')
-                                  
+
                                             ->helperText('Formato: JPG, PNG. Máximo 2MB'),
                                     ]),
 
@@ -64,17 +65,17 @@ class Setting extends Page
                                         Forms\Components\Grid::make()
                                             ->schema([
                                                 Forms\Components\TextInput::make('commercial_name')
-                                                    ->label('Nombre Comercial')                                    
+                                                    ->label('Nombre Comercial')
                                                     ->required()
                                                     ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('company_name')
-                                                    ->label('Nombre de la Compañia')                                 
+                                                    ->label('Nombre de la Compañia')
                                                     ->required()
                                                     ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('type_company')
-                                                    ->label('Tipo de Compañia')                                          
+                                                    ->label('Tipo de Compañia')
                                                     ->required()
                                                     ->columnSpan(2),
                                             ]),
@@ -111,7 +112,7 @@ class Setting extends Page
                                                             ->label('Web')
                                                             ->placeholder('Ingrese la dirección')
                                                             ->required(),
-                                                    ])
+                                                    ]),
                                             ]),
                                     ]),
                                 Forms\Components\Section::make('Ubicación')

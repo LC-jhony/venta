@@ -37,6 +37,7 @@ class Purchase extends Model
             foreignKey: 'supplier_id'
         );
     }
+
     public function quote(): BelongsTo
     {
         return $this->belongsTo(

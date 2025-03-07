@@ -19,10 +19,10 @@ class QuoteFactory extends Factory
     {
         return [
             'user_id' => User::inRandomOrder()->first()->id,
-            'number_quote'  => $this->faker->ean13(),
+            'number_quote' => $this->faker->ean13(),
             'notes' => $this->faker->paragraph(),
             'valid_date' => $this->faker->dateTimeBetween('now', '+1 year'),
-            'status'=> $this->faker->boolean(),
+            'status' => $this->faker->boolean(),
             'total' => fake()->randomFloat(2, 100, 1000),
         ];
     }

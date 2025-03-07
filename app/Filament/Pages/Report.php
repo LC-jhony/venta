@@ -2,17 +2,14 @@
 
 namespace App\Filament\Pages;
 
-use Carbon\Carbon;
-use Filament\Forms;
-use App\Models\Sale;
-use App\Models\User;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Sale;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
-
 
 class Report extends Page
 {
@@ -26,7 +23,14 @@ class Report extends Page
 
     protected static ?int $navigationSort = 1;
 
-    public $startDate, $endDate, $reportType, $productFilter;
+    public $startDate;
+
+    public $endDate;
+
+    public $reportType;
+
+    public $productFilter;
+
     public $showReport = false;
 
     public function mount(): void
@@ -81,7 +85,7 @@ class Report extends Page
                                                 'out_of_stock' => 'Productos Fuera de Stock',
                                                 'near_expiry' => 'Productos próximos a caducar',
                                             ])
-                                            ->visible(fn($get) => $get('reportType') === 'products')
+                                            ->visible(fn ($get) => $get('reportType') === 'products')
                                             ->default('all')
                                             ->required()
                                             ->live()
@@ -108,13 +112,14 @@ class Report extends Page
                                                     'productFilter' => $this->productFilter ?? 'all',
                                                     'setting' => \App\Models\Setting::first(),
                                                 ]);
+
                                                 return response()->streamDownload(
-                                                    fn() => print($pdf->output()),
-                                                    "reporte-{$this->reportType}-" .
-                                                        ($this->productFilter ? "{$this->productFilter}-" : '') .
-                                                        now()->format('Y-m-d') . '.pdf'
+                                                    fn () => print ($pdf->output()),
+                                                    "reporte-{$this->reportType}-".
+                                                        ($this->productFilter ? "{$this->productFilter}-" : '').
+                                                        now()->format('Y-m-d').'.pdf'
                                                 );
-                                            })
+                                            }),
 
                                     ])
                                     ->schema([
@@ -127,21 +132,21 @@ class Report extends Page
                                                 'productFilter' => $this->productFilter ?? 'all',
                                                 'data' => $this->getViewData(),
 
-                                            ])
+                                            ]),
                                     ])
                                     ->columnSpan([
                                         'default' => 'full',
                                         'md' => 8,
                                     ]),
                             ])
-                            ->columns(12)
-                    ])
+                            ->columns(12),
+                    ]),
             ]);
     }
 
     public function getViewData(): array
     {
-        if (!$this->reportType) {
+        if (! $this->reportType) {
             return [];
         }
 
@@ -184,11 +189,12 @@ class Report extends Page
                 'subtotal',
                 'tax',
                 'total',
-                'created_at'
+                'created_at',
             ])
             ->orderBy('created_at', 'desc')
             ->get();
     }
+
     private function getPurchasesReport()
     {
         return Purchase::with(['user', 'supplier'])
@@ -199,7 +205,7 @@ class Report extends Page
                 'supplier_id',
                 'purchase_number',
                 'total',
-                'created_at'
+                'created_at',
 
             ])
             ->orderBy('created_at', 'desc')
@@ -213,6 +219,7 @@ class Report extends Page
         //     ->groupBy('date')
         //     ->get();
     }
+
     private function getProductsReport()
     {
         $query = Product::query()
@@ -233,7 +240,7 @@ class Report extends Page
                 WHEN stock <= 0 THEN "sin stock"
                 WHEN stock <= stock_minimum THEN "stock bajo"
                 ELSE "normal"
-            END as status')
+            END as status'),
             ]);
 
         switch ($this->productFilter) {
@@ -255,6 +262,7 @@ class Report extends Page
             ->orderBy('stock', 'asc')
             ->get();
     }
+
     private function getInventoryReport()
     {
         return Product::query()
@@ -271,7 +279,7 @@ class Report extends Page
                 WHEN stock <= stock_minimum THEN "critico"  
                 WHEN stock <= (stock_minimum * 1.5) THEN "advertencia"
                 ELSE "normal"
-            END as stock_status')
+            END as stock_status'),
             ])
             ->orderBy('stock_status', 'desc')
             ->orderBy('stock', 'asc')

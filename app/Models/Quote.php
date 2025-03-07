@@ -53,6 +53,7 @@ class Quote extends Model
             related: QuoteSupplier::class,
         );
     }
+
     public function purchases(): HasMany
     {
         return $this->hasMany(

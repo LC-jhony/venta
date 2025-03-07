@@ -16,6 +16,7 @@ class SuppliersFactory extends Factory
      * @return array<string, mixed>
      */
     protected $model = Supplier::class;
+
     public function definition(): array
     {
         return [
@@ -27,7 +28,7 @@ class SuppliersFactory extends Factory
             'description' => $this->faker->optional()->text(200),
             'country' => $this->faker->optional()->country(),
             'city' => $this->faker->optional()->city(),
-            'state' => $this->faker->optional()->state(), 
+            'state' => $this->faker->optional()->state(),
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Purchase;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PurchaseSeeder extends Seeder
@@ -13,6 +12,6 @@ class PurchaseSeeder extends Seeder
      */
     public function run(): void
     {
-       Purchase::factory(600)->create();
+        Purchase::factory(600)->create();
     }
 }
