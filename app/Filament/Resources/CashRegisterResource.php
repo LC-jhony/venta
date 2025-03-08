@@ -38,17 +38,20 @@ class CashRegisterResource extends Resource
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Select::make('user_id')
+                            ->label('Usuario')
                             ->relationship('user', 'name')
                             ->default(Auth::id() ?? 1)
                             ->required()
                             ->disabled()
                             ->dehydrated(),
                         Forms\Components\DatePicker::make('open_date')
+                            ->label('Fecha de apertura')
                             ->required()
                             ->default(now())
                             ->disabled()
                             ->dehydrated(true),
                         Forms\Components\TextInput::make('initial_amount')
+                            ->label('Monto inicial')
                             ->required()
                             ->numeric()
                             ->minValue(0)
@@ -56,13 +59,15 @@ class CashRegisterResource extends Resource
                     ])
                     ->columns(3),
                 Forms\Components\Textarea::make('notes')
+                    ->label('Notas')
                     ->columnSpanFull(),
                 Forms\Components\Grid::make()
                     ->schema([
                         Forms\Components\Toggle::make('status')
+                            ->label('Estado')
                             ->required()
                             ->default(true)
-                            ->disabled(fn ($record) => $record && ! $record->status),
+                            ->disabled(fn($record) => $record && ! $record->status),
                     ])->columns(3),
             ]);
     }
@@ -72,19 +77,23 @@ class CashRegisterResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
+                    ->label('Usuario')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('open_date')
+                    ->label('Fecha de apertura')
                     ->date()
                     ->sortable()
                     ->badge()
                     ->color('info'),
                 Tables\Columns\TextColumn::make('close_date')
+                    ->label('Fecha de cierre')
                     ->date()
                     ->sortable()
                     ->badge()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('initial_amount')
+                    ->label('Monto inicial')
                     ->searchable()
                     ->numeric()
                     ->sortable()
@@ -92,20 +101,25 @@ class CashRegisterResource extends Resource
                     ->badge()
                     ->color('success'),
                 Tables\Columns\TextColumn::make('final_amount')
+                    ->label('Monto final')
                     ->searchable()
                     ->money()
                     ->badge()->color('danger'),
                 Tables\Columns\IconColumn::make('status')
+                    ->label('Estado')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Actualizado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label('Eliminado')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -116,10 +130,11 @@ class CashRegisterResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\actions\Action::make('close')
+                    ->label('Cerrar Caja')
                         ->requiresConfirmation()
                         ->color('danger')
                         ->icon('fas-lock')
-                        ->visible(fn ($record) => $record->status)
+                        ->visible(fn($record) => $record->status)
                         ->action(function (CashRegister $record) {
                             $totalOutput = $record->cashMovements()
                                 ->where('type', 'Salida')
@@ -135,10 +150,11 @@ class CashRegisterResource extends Resource
                             ]);
                         }),
                     Tables\Actions\Action::make('Movement')
+                    ->label('Movimiento')
                         ->color('success')
                         ->icon('heroicon-o-inbox-arrow-down')
-                        ->visible(fn ($record) => $record->status)
-                        ->fillForm(fn (CashRegister $record): array => [
+                        ->visible(fn($record) => $record->status)
+                        ->fillForm(fn(CashRegister $record): array => [
                             'user_id' => $record->user_id,
                             'cash_register_id' => $record->id,
                         ])
@@ -163,9 +179,9 @@ class CashRegisterResource extends Resource
                                 ->success()
                                 ->title('Movimiento de Caja')
                                 ->body(
-                                    'Se ha registrado un movimiento de '.
-                                        ($data['type'] === 'Entrada' ? 'Entrada' : 'Salida').
-                                        ' por $'.number_format((float) $data['amount'], 2)
+                                    'Se ha registrado un movimiento de ' .
+                                        ($data['type'] === 'Entrada' ? 'Entrada' : 'Salida') .
+                                        ' por $' . number_format((float) $data['amount'], 2)
                                 )
                                 ->send();
                         }),
