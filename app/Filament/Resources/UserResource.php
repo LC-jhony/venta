@@ -20,6 +20,7 @@ class UserResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup = 'Filament Shield';
+
     public static function getNavigationBadge(): ?string
     {
         return number_format(static::getModel()::count());
@@ -42,9 +43,9 @@ class UserResource extends Resource
                             ->maxLength(255),
                         Forms\Components\TextInput::make('password')
                             ->label('Contraseña')
-                            ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
-                            ->dehydrated(fn(?string $state): bool => filled($state))
-                            ->required(fn(string $operation): bool => $operation === 'create')
+                            ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
+                            ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->required(fn (string $operation): bool => $operation === 'create')
                             ->password()
                             ->revealable()
                             ->confirmed()
@@ -53,7 +54,7 @@ class UserResource extends Resource
                             ->label('Confirmar Contraseña')
                             ->password()
                             ->revealable()
-                            ->required(fn(string $operation): bool => $operation === 'create')
+                            ->required(fn (string $operation): bool => $operation === 'create')
                             ->maxLength(255),
 
                     ])->columns(2),
@@ -62,7 +63,7 @@ class UserResource extends Resource
                         // Forms\Components\CheckboxList::make('roles')
                         //     ->relationship('roles', 'name')
                         //     ->searchable(),
-                    ])
+                    ]),
             ]);
     }
 
